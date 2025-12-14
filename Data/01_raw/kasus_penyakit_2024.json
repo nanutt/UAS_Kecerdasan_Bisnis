@@ -1,0 +1,678 @@
+{
+    "status": "OK",
+    "data-availability": "available",
+    "data": [
+        {
+            "page": 1,
+            "pages": 1,
+            "per_page": 1,
+            "count": 1,
+            "total": 1
+        },
+        {
+            "change_log": [],
+            "judul_tabel": "Kasus Penyakit Menurut Kabupaten/Kota dan Jenis Penyakit di Provinsi Kalimantan Selatan, 2024",
+            "judul_tabel_en": "Disease by Regency/Municipality and Type of Disease in Kalimantan Selatan Province, 2024",
+            "lingkup": "Kabupaten/Kota&lt;br&gt;&lt;i&gt;Regency/Municipality&lt;/i&gt;",
+            "lingkup_id": "Kabupaten/Kota",
+            "lingkup_en": "Regency/Municipality",
+            "tahun_data": 2024,
+            "wilayah": "Kalimantan Selatan",
+            "penanggung_jawab": "Dinas Kesehatan Provinsi Kalimantan Selatan",
+            "show_satuan": false,
+            "id_subject": "Z2I4TjdNeVZqbkMyaTFCZVhBVkE4QT09",
+            "bab": "Sosial dan Kesejahteraan Rakyat",
+            "bab_en": "Social and Welfare",
+            "subject": "Kesehatan",
+            "subject_en": "Health",
+            "mms_id": 522,
+            "mms_subject": "Kesehatan",
+            "keterangan_data": {
+                "...": "Data tidak tersedia",
+                "–": "Tidak ada atau nol",
+                "NA": "Data tidak dapat ditampilkan",
+                "e": "Angka estimasi",
+                "r": "Angka diperbaiki",
+                "~0": "Data dapat diabaikan",
+                "*": "Angka sementara",
+                "**": "Angka sangat sementara",
+                "***": "Angka sangat sangat sementara"
+            },
+            "kolom": {
+                "uaikde6heaivlwdqabcf": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - Angka Penemuan TBC",
+                    "nama_variabel_en": "TBC Case Detection Rate",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 1,
+                    "metadata_indikator": "Angka Penemuan TBC (%)",
+                    "metadata_konsep_definisi": "&lt;p&gt;Jumlah semua kasus tuberkulosis yang diobati dan dilaporkan di antara jumlah semua kasus tuberkulosis (insiden)&lt;br/&gt;jumlah semua kasus tuberkulosis yang diobati dan dilapokan terhadap perkiraan jumlah semua kasus tuberkulosis (%)&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                },
+                "xa3wrsnhbr4nmsqs4kri": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - Angka Keberhasilan Pengobatan TBC",
+                    "nama_variabel_en": "TBC Success Rate",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 1,
+                    "metadata_indikator": "Angka Keberhasilan Pengobatan TBC (%)",
+                    "metadata_konsep_definisi": "&lt;p&gt;Jumlah pasien tuberkulosis semua kasus yang sembuh dan pengobatan lengkap diantara semua kasus tuberkulosis yang diobati dan dilaporkan&lt;br/&gt;Jumlah semua kasus tuberkulosis yang sembuh dan pengobatan lengkap dibagi jumlah semua kasus tuberkulosis yang diobati dan dilaporkan pada kohort yang sama (%)&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                },
+                "fmumuesaff": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - HIV/AIDS Kasus Baru",
+                    "nama_variabel_en": "Jumlah Kasus Penyakit - HIV/AIDS Kasus Baru",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 0,
+                    "metadata_indikator": "Jumlah Kasus Baru AIDS",
+                    "metadata_konsep_definisi": "&lt;p&gt;&lt;i&gt;(Acquired Immune Deficiency Syndrome)&lt;/i&gt; dewasa bila terdapat 2 gejala mayor dan 1 gejala minor dan tidak ada sebab-sebab immunosupresi yang diketahui seperti kanker, malnutrisi berat atau etiologi lainnya. Kasus pada anak bila terdapat paling sedikit 2 gejala mayor dan 2 gejala minor dan tidak ada sebab-sebab immunosupresi yang diketahui seperti kanker, malnutrisi berat atau etiologi lainnya&lt;br/&gt;Jumlah kasus baru AIDS yang baru ditemukan pada kurun waktu tertentu di suatu wilayah&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                },
+                "czcjnafyzmbswvdud21x": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - Penemuan Kasus Baru Kusta per 100.000 Penduduk",
+                    "nama_variabel_en": "New Case Detection Rate of Leprosy per 100,000 Population",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 2,
+                    "metadata_indikator": "Penemuan Kasus Baru Kusta per 100.000 Penduduk",
+                    "metadata_konsep_definisi": "&lt;p&gt;Kasus kusta baru yang ditemukan pada periode tertentu per 100.000 penduduk&lt;br/&gt;jumlah kasus kusta yang baru ditemukan pada kurun waktu tertentu di suatu wilayah dibagi jumlah penduduk di wilayah dan kurun waktu yang sama dikali 100.000&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                },
+                "tqqci2nnm0gpq2mzhyhc": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - Angka Kesakitan Malaria per 1.000 Penduduk",
+                    "nama_variabel_en": "Annual Parasite Incidence per 1,000 Population",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 2,
+                    "metadata_indikator": "Angka Kesakitan Malaria per 1.000 Penduduk",
+                    "metadata_konsep_definisi": "&lt;p&gt;Kasus malaria positif (dengan pemeriksaan sediaan darah) pada periode tertentu per 1.000 penduduk&lt;br/&gt;Jumlah kasus malaria positif (dengan pemeriksaan sediaan darah) dalam kurun waktu tertentu dibagi jumlah penduduk di wilayah dan kurun waktu yang sama dikali 1.000&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                },
+                "9n8me3mg1beg4pv1jckl": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - Angka Kesakitan DBD per 100.000 Penduduk",
+                    "nama_variabel_en": "DHF Incidence Rate per 100,000 Population",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 2,
+                    "metadata_indikator": "Angka Kesakitan DBD per 100.000 Penduduk",
+                    "metadata_konsep_definisi": "&lt;p&gt;Kasus baru DBD pada kurun waktu tertentu per 100.000 penduduk pada kurun waktu yang sama&lt;br/&gt;Jumlah kasus baru DBD pada kurun waktu tertentu dibagi jumlah penduduk pada kurun waktu yang sama dikali 100.000&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                }
+            },
+            "data": [
+                {
+                    "label": "Tanah Laut",
+                    "label_raw": "Tanah Laut",
+                    "satuan": null,
+                    "kode_wilayah": 6301000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "672,0",
+                            "value_raw": "672,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "529,0",
+                            "value_raw": "529,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "45",
+                            "value_raw": "45",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "8,00",
+                            "value_raw": "8,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,10",
+                            "value_raw": "0,10",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "106,47",
+                            "value_raw": "106,47",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kota Baru",
+                    "label_raw": "Kota Baru",
+                    "satuan": null,
+                    "kode_wilayah": 6302000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "751,0",
+                            "value_raw": "751,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "512,0",
+                            "value_raw": "512,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "22",
+                            "value_raw": "22",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "23,00",
+                            "value_raw": "23,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,07",
+                            "value_raw": "0,07",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "54,22",
+                            "value_raw": "54,22",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Banjar",
+                    "label_raw": "Banjar",
+                    "satuan": null,
+                    "kode_wilayah": 6303000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "1.048,0",
+                            "value_raw": "1.048,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "897,0",
+                            "value_raw": "897,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "71",
+                            "value_raw": "71",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "17,00",
+                            "value_raw": "17,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,11",
+                            "value_raw": "0,11",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "90,06",
+                            "value_raw": "90,06",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Barito Kuala",
+                    "label_raw": "Barito Kuala",
+                    "satuan": null,
+                    "kode_wilayah": 6304000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "363,0",
+                            "value_raw": "363,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "296,0",
+                            "value_raw": "296,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "6",
+                            "value_raw": "6",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "12,00",
+                            "value_raw": "12,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,01",
+                            "value_raw": "0,01",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "27,18",
+                            "value_raw": "27,18",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Tapin",
+                    "label_raw": "Tapin",
+                    "satuan": null,
+                    "kode_wilayah": 6305000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "259,0",
+                            "value_raw": "259,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "213,0",
+                            "value_raw": "213,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "15",
+                            "value_raw": "15",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "10,00",
+                            "value_raw": "10,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,04",
+                            "value_raw": "0,04",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "79,11",
+                            "value_raw": "79,11",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Hulu Sungai Selatan",
+                    "label_raw": "Hulu Sungai Selatan",
+                    "satuan": null,
+                    "kode_wilayah": 6306000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "389,0",
+                            "value_raw": "389,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "324,0",
+                            "value_raw": "324,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "25",
+                            "value_raw": "25",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "8,00",
+                            "value_raw": "8,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,03",
+                            "value_raw": "0,03",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "112,46",
+                            "value_raw": "112,46",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Hulu Sungai Tengah",
+                    "label_raw": "Hulu Sungai Tengah",
+                    "satuan": null,
+                    "kode_wilayah": 6307000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "665,0",
+                            "value_raw": "665,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "548,0",
+                            "value_raw": "548,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "18",
+                            "value_raw": "18",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "13,00",
+                            "value_raw": "13,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,03",
+                            "value_raw": "0,03",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "128,25",
+                            "value_raw": "128,25",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Hulu Sungai Utara",
+                    "label_raw": "Hulu Sungai Utara",
+                    "satuan": null,
+                    "kode_wilayah": 6308000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "525,0",
+                            "value_raw": "525,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "413,0",
+                            "value_raw": "413,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "31",
+                            "value_raw": "31",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "13,00",
+                            "value_raw": "13,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,01",
+                            "value_raw": "0,01",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "40,84",
+                            "value_raw": "40,84",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Tabalong",
+                    "label_raw": "Tabalong",
+                    "satuan": null,
+                    "kode_wilayah": 6309000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "503,0",
+                            "value_raw": "503,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "415,0",
+                            "value_raw": "415,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "45",
+                            "value_raw": "45",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "7,00",
+                            "value_raw": "7,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,22",
+                            "value_raw": "0,22",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "13,17",
+                            "value_raw": "13,17",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Tanah Bumbu",
+                    "label_raw": "Tanah Bumbu",
+                    "satuan": null,
+                    "kode_wilayah": 6310000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "515,0",
+                            "value_raw": "515,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "290,0",
+                            "value_raw": "290,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "66",
+                            "value_raw": "66",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "9,00",
+                            "value_raw": "9,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,05",
+                            "value_raw": "0,05",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "103,00",
+                            "value_raw": "103,00",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Balangan",
+                    "label_raw": "Balangan",
+                    "satuan": null,
+                    "kode_wilayah": 6311000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "262,0",
+                            "value_raw": "262,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "264,0",
+                            "value_raw": "264,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "10",
+                            "value_raw": "10",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "14,00",
+                            "value_raw": "14,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,10",
+                            "value_raw": "0,10",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "109,91",
+                            "value_raw": "109,91",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kota Banjarmasin",
+                    "label_raw": "Kota Banjarmasin",
+                    "satuan": null,
+                    "kode_wilayah": 6371000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "2.769,0",
+                            "value_raw": "2.769,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "1.724,0",
+                            "value_raw": "1.724,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "260",
+                            "value_raw": "260",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "9,00",
+                            "value_raw": "9,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,04",
+                            "value_raw": "0,04",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "10,11",
+                            "value_raw": "10,11",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kota Banjar Baru",
+                    "label_raw": "Kota Banjar Baru",
+                    "satuan": null,
+                    "kode_wilayah": 6372000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "730,0",
+                            "value_raw": "730,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "563,0",
+                            "value_raw": "563,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "74",
+                            "value_raw": "74",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "3,00",
+                            "value_raw": "3,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,10",
+                            "value_raw": "0,10",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "148,18",
+                            "value_raw": "148,18",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kalimantan Selatan",
+                    "label_raw": "Kalimantan Selatan",
+                    "satuan": null,
+                    "kode_wilayah": 6300000,
+                    "variables": {
+                        "uaikde6heaivlwdqabcf": {
+                            "value": "9.451,0",
+                            "value_raw": "9.451,0",
+                            "value_code": null
+                        },
+                        "xa3wrsnhbr4nmsqs4kri": {
+                            "value": "6.988,0",
+                            "value_raw": "6.988,0",
+                            "value_code": null
+                        },
+                        "fmumuesaff": {
+                            "value": "688",
+                            "value_raw": "688",
+                            "value_code": null
+                        },
+                        "czcjnafyzmbswvdud21x": {
+                            "value": "146,00",
+                            "value_raw": "146,00",
+                            "value_code": null
+                        },
+                        "tqqci2nnm0gpq2mzhyhc": {
+                            "value": "0,07",
+                            "value_raw": "0,07",
+                            "value_code": null
+                        },
+                        "9n8me3mg1beg4pv1jckl": {
+                            "value": "72,78",
+                            "value_raw": "72,78",
+                            "value_code": null
+                        }
+                    }
+                }
+            ],
+            "catatan": "",
+            "sumber": "&lt;p&gt;\nDinas Kesehatan Provinsi Kalimantan Selatan&lt;br&gt;&lt;/p&gt;",
+            "versi": 3,
+            "table_created": "2025-02-05 09:19:25",
+            "table_updated": "2025-02-25 22:35:57",
+            "status": 200,
+            "condition": "OK",
+            "message": "-",
+            "created": "2025-12-15 00:11:13"
+        }
+    ]
+}

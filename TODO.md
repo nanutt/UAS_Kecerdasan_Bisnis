@@ -1,0 +1,3 @@
+- [x] Add imports for shutil and datetime
+- [x] Define BACKUP_PATH variable
+- [x] Modify main_load_process to create backup before deleting existing DB

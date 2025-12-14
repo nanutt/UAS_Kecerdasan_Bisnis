@@ -1,0 +1,252 @@
+{
+    "status": "OK",
+    "data-availability": "available",
+    "data": [
+        {
+            "page": 1,
+            "pages": 1,
+            "per_page": 1,
+            "count": 1,
+            "total": 1
+        },
+        {
+            "judul_tabel": "Jumlah Kasus Penyakit Menurut Kabupaten/Kota dan Jenis Penyakit di Provinsi Kalimantan Selatan, 2022",
+            "judul_tabel_en": "Number of Disease Cases by Regency/Municipality and Type of Disease in Kalimantan Selatan Province, 2022",
+            "lingkup": "Kabupaten/Kota&lt;br&gt;&lt;i&gt;Regency/Municipality&lt;/i&gt;",
+            "lingkup_id": "Kabupaten/Kota",
+            "lingkup_en": "Regency/Municipality",
+            "tahun_data": 2022,
+            "wilayah": "Kalimantan Selatan",
+            "penanggung_jawab": "Dinas Kesehatan Provinsi Kalimantan Selatan",
+            "show_satuan": false,
+            "id_subject": "Z2I4TjdNeVZqbkMyaTFCZVhBVkE4QT09",
+            "bab": "Sosial dan Kesejahteraan Rakyat",
+            "bab_en": "Social and Welfare",
+            "subject": "Kesehatan",
+            "subject_en": "Health",
+            "mms_id": 522,
+            "mms_subject": "Kesehatan",
+            "keterangan_data": {
+                "...": "Data tidak tersedia",
+                "–": "Tidak ada atau nol",
+                "0": "Data dapat diabaikan",
+                "NA": "Data tidak dapat ditampilkan",
+                "e": "Angka estimasi",
+                "r": "Angka diperbaiki",
+                "x": "Angka sementara",
+                "xx": "Angka sangat sementara",
+                "xxx": "Angka sangat sangat sementara"
+            },
+            "kolom": {
+                "fmumuesaff": {
+                    "nama_variabel": "Jumlah Kasus Penyakit - HIV/AIDS Kasus Baru",
+                    "nama_variabel_en": "Jumlah Kasus Penyakit - HIV/AIDS Kasus Baru",
+                    "tipe": "Numerik",
+                    "angka_desimal_dibelakang_koma": 0,
+                    "metadata_indikator": "Jumlah Kasus Baru AIDS",
+                    "metadata_konsep_definisi": "&lt;p&gt;&lt;i&gt;(Acquired Immune Deficiency Syndrome)&lt;/i&gt; dewasa bila terdapat 2 gejala mayor dan 1 gejala minor dan tidak ada sebab-sebab immunosupresi yang diketahui seperti kanker, malnutrisi berat atau etiologi lainnya. Kasus pada anak bila terdapat paling sedikit 2 gejala mayor dan 2 gejala minor dan tidak ada sebab-sebab immunosupresi yang diketahui seperti kanker, malnutrisi berat atau etiologi lainnya&lt;br/&gt;Jumlah kasus baru AIDS yang baru ditemukan pada kurun waktu tertentu di suatu wilayah&lt;/p&gt;",
+                    "metadata_kegunaan": null,
+                    "metadata_keterangan_tambahan": null,
+                    "metadata_interpretasi": null,
+                    "metadata_rumusan": [],
+                    "metadata_rumus_html": null,
+                    "metadata_dihasilkan_oleh": [],
+                    "tanggal_cut_off": null
+                }
+            },
+            "data": [
+                {
+                    "label": "Tanah Laut",
+                    "label_raw": "Tanah Laut",
+                    "satuan": null,
+                    "kode_wilayah": 6301000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "15",
+                            "value_raw": "15",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kota Baru",
+                    "label_raw": "Kota Baru",
+                    "satuan": null,
+                    "kode_wilayah": 6302000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "...",
+                            "value_raw": null,
+                            "value_code": "..."
+                        }
+                    }
+                },
+                {
+                    "label": "Banjar",
+                    "label_raw": "Banjar",
+                    "satuan": null,
+                    "kode_wilayah": 6303000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "59",
+                            "value_raw": "59",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Barito Kuala",
+                    "label_raw": "Barito Kuala",
+                    "satuan": null,
+                    "kode_wilayah": 6304000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "10",
+                            "value_raw": "10",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Tapin",
+                    "label_raw": "Tapin",
+                    "satuan": null,
+                    "kode_wilayah": 6305000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "8",
+                            "value_raw": "8",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Hulu Sungai Selatan",
+                    "label_raw": "Hulu Sungai Selatan",
+                    "satuan": null,
+                    "kode_wilayah": 6306000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "11",
+                            "value_raw": "11",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Hulu Sungai Tengah",
+                    "label_raw": "Hulu Sungai Tengah",
+                    "satuan": null,
+                    "kode_wilayah": 6307000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "31",
+                            "value_raw": "31",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Hulu Sungai Utara",
+                    "label_raw": "Hulu Sungai Utara",
+                    "satuan": null,
+                    "kode_wilayah": 6308000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "28",
+                            "value_raw": "28",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Tabalong",
+                    "label_raw": "Tabalong",
+                    "satuan": null,
+                    "kode_wilayah": 6309000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "23",
+                            "value_raw": "23",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Tanah Bumbu",
+                    "label_raw": "Tanah Bumbu",
+                    "satuan": null,
+                    "kode_wilayah": 6310000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "41",
+                            "value_raw": "41",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Balangan",
+                    "label_raw": "Balangan",
+                    "satuan": null,
+                    "kode_wilayah": 6311000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "14",
+                            "value_raw": "14",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kota Banjarmasin",
+                    "label_raw": "Kota Banjarmasin",
+                    "satuan": null,
+                    "kode_wilayah": 6371000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "230",
+                            "value_raw": "230",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kota Banjar Baru",
+                    "label_raw": "Kota Banjar Baru",
+                    "satuan": null,
+                    "kode_wilayah": 6372000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "82",
+                            "value_raw": "82",
+                            "value_code": null
+                        }
+                    }
+                },
+                {
+                    "label": "Kalimantan Selatan",
+                    "label_raw": "Kalimantan Selatan",
+                    "satuan": null,
+                    "kode_wilayah": 6300000,
+                    "variables": {
+                        "fmumuesaff": {
+                            "value": "552",
+                            "value_raw": "552",
+                            "value_code": null
+                        }
+                    }
+                }
+            ],
+            "catatan": "&lt;p&gt;X&lt;/p&gt;",
+            "sumber": "&lt;p&gt;\nDinas Kesehatan Provinsi Kalimantan Selatan/ Health Agency of Kalimantan Selatan Province \n&lt;br&gt;&lt;/p&gt;",
+            "versi": 1,
+            "table_created": "2023-02-20 09:52:00",
+            "change_log": [],
+            "status": 200,
+            "condition": "OK",
+            "message": "-",
+            "created": "2025-12-15 00:11:08"
+        }
+    ]
+}
