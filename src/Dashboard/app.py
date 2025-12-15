@@ -6,6 +6,7 @@ from dash import Dash, dcc, html, dash_table
 import plotly.express as px
 import traceback
 import streamlit.components.v1 as components
+import plotly.graph_objects as go
 
 # --- KONFIGURASI TEMA DAN LAYOUT ---
 st.set_page_config(
@@ -83,25 +84,24 @@ st.markdown(
     }
 
     /* Terapkan Poppins sebagai font utama di seluruh komponen yang kita kendalikan */
-    body, .stApp, .card-dashboard, .card-sidebar, .trend-chart-container, .trend-chart-title, .sidebar-title, .item-text {
+    body, .stApp, .card-dashboard, .trend-chart-container, .sidebar-title, .item-text {
         font-family: 'Poppins', sans-serif !important;
     }
     
-    /* Buat Sidebar */
-    .card-sidebar {
-        background-color: #044335; /* Hijau Gelap */
-        border-radius: 0px 20px 20px 0px;
-        position: fixed;
-        width: 17.5%;
-        top: 150px;
-        left: 0;
-        height: calc(100vh - 125px - 5px);
-        z-index: 900;
+    /* Buat Sidebar menggunakan native Streamlit component, dengan gaya custom */    
+    [data-testid="stSidebar"] {    
+        background-color: transparent !important;    
+    }
+        
+    [data-testid="stSidebar"] > div:first-child {    
+        top: 150px; /* Jarak dari atas layar */
+        width: 327px;    
+        height: calc(100vh - 160px); /* Tinggi sidebar, sisakan ruang di bawah */    
+        background-color: #044335;    
+        border-radius: 0px 20px 20px 0px;    
+        padding-top: 10px; /* Kurangi padding karena 'top' sudah diatur */    
     }
     
-    .sidebar-content-wrapper {
-        padding: 20px;
-    }
     
     .sidebar-title {
         color: white; 
@@ -113,7 +113,7 @@ st.markdown(
     }
 
     /* Lebih spesifik untuk memastikan style tidak tertimpa oleh Streamlit */
-    .card-sidebar .sidebar-title {
+    [data-testid="stSidebar"] .sidebar-title {
         color: #ffffff !important;
     }
 
@@ -145,27 +145,28 @@ st.markdown(
         margin-right: 10px;
         font-weight: bold;
     }
-
-    .year-radio-item {
-        /* Mirip dengan sidebar-item */
-        color: white; 
-        margin-bottom: 5px; 
-        padding-left: 0; 
+    
+    /* Styling untuk radio button tahun di sidebar */
+    div[role="radiogroup"] {
+        padding-left: 35px !important; /* Align with categories */
     }
 
-    .year-radio-item label {
-        display: flex;
-        align-items: center;
-        cursor: pointer; /* Menunjukkan bahwa seluruh baris dapat diklik */
+    /* Style each radio item's label */
+    div[role="radiogroup"] label {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        margin-bottom: 10px !important; /* Space between items */
     }
 
-    .year-radio-item input[type="radio"] {
-        /* Mengatur margin dan ukuran radio button */
-        margin-right: 15px; 
-        width: 1.2rem;
-        height: 1.2rem;
-        /* Kita bisa menambahkan styling kustom di sini untuk membuatnya terlihat seperti checkbox,
-        tetapi untuk saat ini, kita biarkan style default radio button agar fungsinya terlihat jelas. */
+    /* Style the radio input button itself */
+    div[role="radiogroup"] input[type="radio"] {
+        width: 20px !important;
+        height: 20px !important;
+        cursor: pointer !important;
+        accent-color: #4dd0e1 !important; /* Apply user's desired color */
+        margin-right: 15px !important; /* Space between button and text */
     }
     
     /* Buat Grafik tren */
@@ -181,13 +182,6 @@ st.markdown(
         margin-top: 9px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
-    .trend-chart-title {
-        color: #044335;
-        font-size: 1.5rem;
-        font-weight: 600;
-        font-family: 'Poppins', sans-serif;
-        margin: 0 0 15px 0;
-    }
 
     /* Pastikan Plotly chart berada di dalam kartu putih dan bersih */
     .trend-chart-container .plotly-graph-div,
@@ -200,7 +194,6 @@ st.markdown(
     /* Responsif: sedikit padding pada layar kecil */
     @media (max-width: 768px) {
         .trend-chart-container { padding: 8px; }
-        .trend-chart-title { font-size: 1.2rem; }
     }
     /* Catatan: selector untuk judul chart/metric/tabel dihilangkan karena
        markup saat ini tidak menggunakan elemen-elemen tersebut. Jika nanti
@@ -244,44 +237,40 @@ def main_app():
         unsafe_allow_html=True
     )
 
-    # --- Sidebar (separate) ---
-    st.markdown(
-        """
-        <div class="card-sidebar">
-            <div class="sidebar-content-wrapper">
-                <h4 class="sidebar-title">Kategori</h4>
-                <ul class="sidebar-list">
-                    <li class="sidebar-item">
-                        <span class="category-icon">&gt;</span>
-                        <span class="category-icon">👤</span>
-                        <span class="item-text">Tenaga Kesehatan</span>
-                    </li>
-                    <li class="sidebar-item">
-                        <span class="category-icon">&gt;</span>
-                        <span class="category-icon">📦</span>
-                        <span class="item-text">Kasus Penyakit</span>
-                    </li>
-                </ul>
-                <h4 class="sidebar-title">Tahun</h4>
-                <ul class="sidebar-list">
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2024"><span class="item-text">2024</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2023"><span class="item-text">2023</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2022"><span class="item-text">2022</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2021"><span class="item-text">2021</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2020"><span class="item-text">2020</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2019"><span class="item-text">2019</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2018"><span class="item-text">2018</span></label></li>
-                    <li class="sidebar-item year-radio-item"><label><input type="radio" name="selected_year" value="2017"><span class="item-text">2017</span></label></li>
-                </ul>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # --- Sidebar (Menggunakan st.sidebar untuk interaktivitas) ---
+    with st.sidebar:
+        st.markdown(
+            """
+            <h4 class="sidebar-title">Kategori</h4>
+            <ul class="sidebar-list">
+                <li class="sidebar-item">
+                    <span class="category-icon">&gt;</span>
+                    <span class="category-icon">👤</span>
+                    <span class="item-text">Tenaga Kesehatan</span>
+                </li>
+                <li class="sidebar-item">
+                    <span class="category-icon">&gt;</span>
+                    <span class="category-icon">📦</span>
+                    <span class="item-text">Kasus Penyakit</span>
+                </li>
+            </ul>
+            """, unsafe_allow_html=True
+        )
+        st.markdown('<h4 class="sidebar-title" style="padding-left:20px;">Tahun</h4>', unsafe_allow_html=True)
+        
+        # Widget radio button untuk memilih tahun (lebih stabil dari checkbox custom)
+        selected_year = st.radio(
+            "Pilih Tahun", # Label untuk aksesibilitas, disembunyikan di UI
+            options=[2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017],
+            index=0,
+            key='selected_year', # Menyimpan state pilihan
+            label_visibility='collapsed' # Sembunyikan label "Pilih Tahun"
+        )
+
 
     # === LAYOUT RESPONSIF DENGAN KOLOM STREAMLIT ===
-    # Buat tiga kolom: spacer (untuk sidebar), kolom grafik (50%), dan kolom kanan untuk Kab/Kota
-    left_spacer, chart_col, right_col = st.columns([0.59, 2.4, 1], gap="small")
+    # Buat dua kolom utama, spacer tidak lagi diperlukan karena st.sidebar
+    chart_col, right_col = st.columns([2.4, 1], gap="small")
 
     # === Grafi Tren di kolom tengah (sekitar 50% layar) ===
     with chart_col:
@@ -372,11 +361,11 @@ def main_app():
                     fig.data[1].hovertemplate = 'Tahun: %{x}<br>Total Kasus: %{customdata:,}<extra></extra>'                   
                     fig_html = fig.to_html(full_html=False, include_plotlyjs='cdn')                    
                     card_html = f"""
-                    <div style="background-color: #ffffff; border-radius: 8px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; box-sizing: border-box;">
-                        <h3 style="color:#044335; font-size:1.25rem; margin-left: 20px; font-family: 'Poppins' !important; ">Grafik Tren</h3>
+                    <div style="background-color: #ffffff; border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; box-sizing: border-box; margin-top: 25px;" class="trend-chart-container">
+                        <h3 style="color:#044335; font-size:1.25rem; margin-left: 20px; font-family: 'Poppins', sans-serif !important; ">Grafik Tren</h3>
                         <style>
                             /* Pastikan elemen Plotly transparan supaya wrapper putih terlihat */
-                            .plotly-graph-div, .js-plotly-plot {{ font-family: 'Poppins'!important; background-color: transparent !important; width:100% !important; height:auto !important; margin:0; }}
+                            .plotly-graph-div, .js-plotly-plot {{ font-family: 'Poppins', sans-serif !important; background-color: transparent !important; width:100% !important; height:auto !important; margin:0; }}
                             body {{ background-color: transparent !important; margin:0; padding:0; }}
                         </style>
                         {fig_html}
@@ -386,13 +375,250 @@ def main_app():
         except Exception as e:
             st.error(f"Gagal membuat grafik tren: {e}")
 
-        # Tutup container HTML
-        st.markdown("""
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # === Summary Cards dan Donut Chart ===
+        # Tahun yang dipilih diambil dari widget radio di sidebar (st.session_state.selected_year)
+        selected_year = st.session_state.selected_year
 
+        try:
+            # Query data untuk tahun yang dipilih
+            query_summary = """
+            SELECT
+                SUM(COALESCE(total_workforce,0)) AS total_workforce,
+                SUM(COALESCE(total_cases,0)) AS total_cases
+            FROM mart_workload_ratio
+            WHERE tahun = ?
+            """
+            
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_summary = pd.read_sql_query(query_summary, conn, params=(selected_year,))
+            
+            if not df_summary.empty:
+                total_workforce = int(df_summary['total_workforce'].iloc[0])
+                total_cases = int(df_summary['total_cases'].iloc[0])
+                
+                # Hitung persentase
+                total = total_workforce + total_cases
+                if total > 0:
+                    pct_cases = (total_cases / total) * 100
+                    pct_workforce = (total_workforce / total) * 100
+                else:
+                    pct_cases = 0
+                    pct_workforce = 0
+                
+                # HTML untuk Cards dan Donut Chart
+                summary_html = f"""
+                <div style="display: flex; gap: 20px; margin-top: 20px; width: 100%;">
+                    <!-- Kolom Kiri: 2 Cards -->
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Card 1: Total Kasus Penyakit -->
+                        <div style="background: linear-gradient(135deg, #00776b 0%, #044335 100%); 
+                                    border-radius: 15px; padding: 25px; 
+                                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+                                    display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 3.5rem;">📋</div>
+                            <div>
+                                <div style="color: #ffb74d; font-size: 2.5rem; font-weight: bold; font-family: 'Poppins', sans-serif;">
+                                    {total_cases:,}
+                                </div>
+                                <div style="color: white; font-size: 1rem; font-family: 'Poppins', sans-serif;">
+                                    Total Kasus Penyakit
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 2: Total Tenaga Kesehatan -->
+                        <div style="background: linear-gradient(135deg, #00776b 0%, #044335 100%); 
+                                    border-radius: 15px; padding: 25px; 
+                                    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+                                    display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 3.5rem;">👥</div>
+                            <div>
+                                <div style="color: #ffb74d; font-size: 2.5rem; font-weight: bold; font-family: 'Poppins', sans-serif;">
+                                    {total_workforce:,}
+                                </div>
+                                <div style="color: white; font-size: 1rem; font-family: 'Poppins', sans-serif;">
+                                    Total Tenaga Kesehatan
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kolom Kanan: Donut Chart -->
+                    <div style="flex: 1; background-color: white; border-radius: 15px; 
+                                padding: 1px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
+                        <h4 style="color: #044335; text-align: center; margin-bottom: -10px; 
+                                   font-family: 'Poppins', sans-serif;">
+                            Rasio Kasus Penyakit VS Tenaga Kesehatan
+                        </h4>
+                        <div id="donut-chart-{selected_year}" style= "height: 90%; margin-top: 5px;"></div>
+                    </div>
+                </div>
+                
+                <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+                <script>
+                    var data = [{{
+                        values: [{total_cases}, {total_workforce}],
+                        labels: ['Kasus Penyakit', 'Tenaga Kesehatan'],
+                        type: 'pie',
+                        hole: 0.6,
+                        marker: {{
+                            colors: ['#4dd0e1', '#7e57c2']
+                        }},
+                        textinfo: 'none',
+                        hovertemplate: '%{{label}}<br>%{{value:,}}<br>%{{percent}}<extra></extra>'
+                    }}];
+                    
+                    var layout = {{
+                        showlegend: true,
+                        legend: {{
+                            orientation: 'h',
+                            x: 0.5,
+                            xanchor: 'center',
+                            y: -0.1
+                        }},
+                        margin: {{l: 20, r: 20, t: 20, b: 60}},
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        font: {{
+                            family: 'Poppins, sans-serif'
+                        }},
+                        annotations: [{{
+                            text: '100%',
+                            x: 0.5,
+                            y: 0.5,
+                            font: {{
+                                size: 32,
+                                family: 'Poppins, sans-serif',
+                                color: '#044335'
+                            }},
+                            showarrow: false
+                        }}]
+                    }};
+                    
+                    Plotly.newPlot('donut-chart-{selected_year}', data, layout, {{responsive: true}});
+                </script>
+                """
+                
+                components.html(summary_html, height=290, scrolling=False)
+        except Exception as e:
+            st.error(f"Gagal membuat summary cards: {e}")
+                    
+        # === Stacked Bar Chart: Kasus Penyakit per Wilayah ===
+        try:
+            # Query data kasus penyakit per wilayah dan jenis penyakit
+            query_cases = """
+            SELECT
+                nama_wilayah,
+                nama_penyakit,
+                SUM(COALESCE(total_cases,0)) AS total_cases
+            FROM mart_annual_case_summary
+            WHERE tahun = ?
+            GROUP BY nama_wilayah, nama_penyakit
+            ORDER BY nama_wilayah
+            """
+            
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_cases = pd.read_sql_query(query_cases, conn, params=(selected_year,))
+            
+            if not df_cases.empty:
+                # Pivot data untuk stacked bar chart
+                df_pivot = df_cases.pivot(index='nama_wilayah', columns='nama_penyakit', values='total_cases').fillna(0)
+                
+                # Definisi warna untuk setiap penyakit
+                colors = {
+                    'Jumlah Kasus Penyakit - HIV/AIDS Kasus Baru': "#E60A0A",
+                    'Jumlah Kasus Penyakit - Malaria (Suspek)': '#ffb74d',
+                    'Jumlah Kasus Penyakit - TB Paru': '#4dd0e1',
+                    'Jumlah Kasus Penyakit - Pneumonia': '#e57373',
+                    'Jumlah Kasus Penyakit - Kusta': '#64b5f6',
+                    'Jumlah Kasus Penyakit - Tetanus Neonatorum': '#999999',
+                    'Jumlah Kasus Penyakit - Campak': '#ba68c8',
+                    'Jumlah Kasus Penyakit - Diare': '#f06292',
+                    'Jumlah Kasus Penyakit - Demam Berdarah Dengue (DBD)': '#fff176',
+                    'Jumlah Kasus Penyakit - HIV/AIDS Kasus Kumulatif': '#a1887f',
+                    'Jumlah Kasus Penyakit - Infeksi Menular Seksual (IMS)': '#90a4ae',
+                    'Jumlah Kasus Penyakit - Angka Penemuan TBC': '#4db6ac',
+                    'Jumlah Kasus Penyakit - Angka Keberhasilan Pengobatan TBC': '#ffb300',
+                    'Jumlah Kasus Penyakit - Penemuan Kasus Baru Kusta per 100.000 Penduduk': '#9575cd',
+                    'Jumlah Kasus Penyakit - Angka Kesakitan Malaria per 1.000 Penduduk': '#7986cb',
+                    'Jumlah Kasus Penyakit - Angka Kesakitan DBD per 100.000 Penduduk': '#ff8a65'
+                }
+                
+                # Buat figure stacked bar chart
+                fig_bar = go.Figure()
+                
+                for penyakit in df_pivot.columns:
+                    short_name = penyakit.replace('Jumlah Kasus Penyakit - ', '')
+                    fig_bar.add_trace(go.Bar(
+                        name=short_name,
+                        x=df_pivot.index,
+                        y=df_pivot[penyakit],
+                        marker_color=colors.get(penyakit, '#cccccc'),
+                        hovertemplate='%{x}<br>' + short_name + ': %{y:,}<extra></extra>'
+                    ))
+                
+                # Update layout
+                fig_bar.update_layout(
+                    barmode='stack',
+                    title=dict(
+                        text=f'Kasus Penyakit Tahun {selected_year}',
+                        font=dict(size=20, family='Poppins, sans-serif', color='#044335'),
+                        x=0.5,
+                        xanchor='center'
+                    ),
+                    xaxis=dict(
+                        title='',
+                        tickangle=-45,
+                        tickfont=dict(size=11, family='Poppins, sans-serif')
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text='Jumlah Kasus',
+                            font=dict(size=14, family='Poppins, sans-serif')  # Ubah titlefont menjadi title.font
+                        ),
+                        tickfont=dict(size=12, family='Poppins, sans-serif')
+                    ),
+                    legend=dict(
+                        orientation='v',
+                        yanchor='top',
+                        y=1,
+                        xanchor='left',
+                        x=1.02,
+                        font=dict(size=10, family='Poppins, sans-serif'),
+                        bgcolor='rgba(255,255,255,0.8)'
+                    ),
+                    plot_bgcolor='rgba(245,245,245,0.5)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    margin=dict(l=60, r=200, t=80, b=120),
+                    height=500,
+                    font=dict(family='Poppins, sans-serif')
+                )
+                
+                # Render dalam card putih
+                bar_html = f"""
+                <div style="background-color: #ffffff; border-radius: 15px; padding: 10px; 
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; 
+                            box-sizing: border-box; margin-top: 1px;">
+                    <style>
+                        .plotly-graph-div, .js-plotly-plot {{ 
+                            font-family: 'Poppins', sans-serif !important; 
+                            background-color: transparent !important; 
+                            width:100% !important; 
+                            height:auto !important; 
+                        }}
+                    </style>
+                    {fig_bar.to_html(full_html=False, include_plotlyjs='cdn')}
+                </div>
+                """
+                
+                components.html(bar_html, height=600, scrolling=False)
+                
+        except Exception as e:
+            st.error(f"Gagal membuat chart kasus penyakit: {e}")
+            import traceback
+            st.error(traceback.format_exc())
+                    
+                    
     # === DIV 2: Kab/Kota (Warna #044335) ===
     with right_col:
         st.markdown(
