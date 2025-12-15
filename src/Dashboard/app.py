@@ -7,6 +7,8 @@ import plotly.express as px
 import traceback
 import streamlit.components.v1 as components
 import plotly.graph_objects as go
+import folium
+from streamlit_folium import st_folium
 
 # --- KONFIGURASI TEMA DAN LAYOUT ---
 st.set_page_config(
@@ -218,7 +220,22 @@ print(f"PROJECT_ROOT ditentukan sebagai: {PROJECT_ROOT.resolve()}")
 print(f"Path Data Mart yang dihasilkan: {MART_DB_FILE.resolve()}")
  
 # --- FUNGSI UTAMA DASHBOARD ---
-def main_app():    
+def main_app():
+    # Mapping id_tahun ke tahun (definisikan di awal fungsi main_app)
+    year_to_id = {
+        2017: 1, 2018: 2, 2019: 3, 2020: 4,
+        2022: 5, 2023: 6, 2024: 7, 2021: 8
+    }
+
+    # Mapping id_wilayah ke nama wilayah
+    wilayah_mapping = {
+        1: 'Tanah Laut', 2: 'Kota Baru', 3: 'Banjar',
+        4: 'Barito Kuala', 5: 'Tapin', 6: 'Hulu Sungai Selatan',
+        7: 'Hulu Sungai Tengah', 8: 'Hulu Sungai Utara',
+        9: 'Tabalong', 10: 'Balangan', 11: 'Kota Banjarmasin',
+        12: 'Kota Banjar Baru'
+    }
+        
     # --- Fixed header (separate) ---
     st.markdown(
         """
@@ -257,14 +274,12 @@ def main_app():
             """, unsafe_allow_html=True
         )
         st.markdown('<h4 class="sidebar-title" style="padding-left:20px;">Tahun</h4>', unsafe_allow_html=True)
-        
-        # Widget radio button untuk memilih tahun (lebih stabil dari checkbox custom)
         selected_year = st.radio(
-            "Pilih Tahun", # Label untuk aksesibilitas, disembunyikan di UI
+            "Pilih Tahun", 
             options=[2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017],
             index=0,
-            key='selected_year', # Menyimpan state pilihan
-            label_visibility='collapsed' # Sembunyikan label "Pilih Tahun"
+            key='selected_year',
+            label_visibility='collapsed'
         )
 
 
@@ -295,32 +310,24 @@ def main_app():
                 if df_trend.empty:
                     st.info("Tidak ada data di tabel `mart_workload_ratio` untuk ditampilkan.")
                 else:
-                    # Pastikan kolom numerik
                     df_trend['total_workforce'] = pd.to_numeric(df_trend['total_workforce'], errors='coerce').fillna(0)
                     df_trend['total_cases'] = pd.to_numeric(df_trend['total_cases'], errors='coerce').fillna(0)
 
-                    # Figure: gunakan transformasi pada sumbu Y agar jarak visual antar tick
-                    # lebih merata meskipun nilai numerik sangat berbeda (0,100,500,10k,...)
                     custom_ticks = [0, 100, 500, 10000, 15000, 50000, 100000]
 
                     def transform_value(v, ticks):
-                        # Pemetaan piecewise linear ke posisi tertransformasi 0..n-1
                         if v <= ticks[0]:
                             return 0.0
                         for i in range(len(ticks) - 1):
                             t0, t1 = ticks[i], ticks[i+1]
                             if t0 <= v <= t1:
                                 return i + (v - t0) / (t1 - t0)
-                        # Jika melebihi ticks terakhir, kembalikan posisi terakhir
                         return float(len(ticks) - 1)
 
-                    # Terapkan transformasi pada data
                     df_trend['workforce_trans'] = df_trend['total_workforce'].apply(lambda x: transform_value(x, custom_ticks))
                     df_trend['cases_trans'] = df_trend['total_cases'].apply(lambda x: transform_value(x, custom_ticks))
 
                     fig = px.line(df_trend, x='tahun', y=['workforce_trans', 'cases_trans'], markers=True)
-
-                    # Styling tiap trace (warna/isi)
                     fig.data[0].name = 'Total Tenaga Kesehatan'
                     fig.data[0].line.color = '#1f77b4'
                     fig.data[0].line.shape = 'spline'
@@ -345,24 +352,24 @@ def main_app():
 
                     num_intervals = max(1, len(tick_positions) - 1)
                     px_per_interval = 50
-                    chart_height = num_intervals * px_per_interval + 140
+                    chart_height = num_intervals * px_per_interval + 100
                     fig.update_layout(height=chart_height)
 
                     min_year = int(df_trend['tahun'].min())
                     max_year = int(df_trend['tahun'].max())
-                    x_pad = 0.2  # padding dalam satuan tahun
+                    x_pad = 0.2 
                     
-                    fig.update_xaxes(tickmode='linear', tick0=min_year, dtick=1, range=[min_year - x_pad, max_year + x_pad], title_text='Tahun', title_standoff=10, showgrid=False, zeroline=False)
+                    fig.update_xaxes(tickmode='linear', tick0=min_year, dtick=1, range=[min_year - x_pad, max_year + x_pad], title_text='Tahun', title_standoff=30, showgrid=False, zeroline=False)
                     fig.update_yaxes(range=[0, tick_positions[-1]], tickmode='array', tickvals=tick_positions, ticktext=tick_labels, title_text='Jumlah', title_standoff=30)
-                    fig.update_layout(margin=dict(l=78, r=20, t=20, b=70))
+                    fig.update_layout(margin=dict(l=78, r=20, t=0, b=35))
                     fig.data[0].customdata = df_trend['total_workforce']
                     fig.data[1].customdata = df_trend['total_cases']
-                    fig.data[0].hovertemplate = 'Tahun: %{x}<br>Total Tenaga: %{customdata:,}<extra></extra>'
+                    fig.data[0].hovertemplate = 'Tahun: %{x}<br>Total Tenaga Kesehatan: %{customdata:,}<extra></extra>'
                     fig.data[1].hovertemplate = 'Tahun: %{x}<br>Total Kasus: %{customdata:,}<extra></extra>'                   
                     fig_html = fig.to_html(full_html=False, include_plotlyjs='cdn')                    
                     card_html = f"""
                     <div style="background-color: #ffffff; border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; box-sizing: border-box; margin-top: 25px;" class="trend-chart-container">
-                        <h3 style="color:#044335; font-size:1.25rem; margin-left: 20px; font-family: 'Poppins', sans-serif !important; ">Grafik Tren</h3>
+                        <h2 style="color:#044335; font-size:1.7rem; margin-left: 20px; margin-top: 10px; font-family: 'Poppins', sans-serif !important; ">Grafik Tren</h2>
                         <style>
                             /* Pastikan elemen Plotly transparan supaya wrapper putih terlihat */
                             .plotly-graph-div, .js-plotly-plot {{ font-family: 'Poppins', sans-serif !important; background-color: transparent !important; width:100% !important; height:auto !important; margin:0; }}
@@ -371,9 +378,11 @@ def main_app():
                         {fig_html}
                     </div>
                     """
-                    components.html(card_html, height=chart_height + 80, scrolling=False)
+                    components.html(card_html, height=chart_height + 130, scrolling=False)
         except Exception as e:
             st.error(f"Gagal membuat grafik tren: {e}")
+
+        st.markdown('<h3 style="background-color: #DAA520; color: white; text-align: center; border-radius: 10px; padding: 10px; margin-top: 10px;">Analisis Berdasarkan Wilayah</h3>', unsafe_allow_html=True)
 
         # === Summary Cards dan Donut Chart ===
         # Tahun yang dipilih diambil dari widget radio di sidebar (st.session_state.selected_year)
@@ -611,24 +620,325 @@ def main_app():
                 </div>
                 """
                 
-                components.html(bar_html, height=600, scrolling=False)
+                components.html(bar_html, height=540, scrolling=False)
                 
         except Exception as e:
             st.error(f"Gagal membuat chart kasus penyakit: {e}")
             import traceback
             st.error(traceback.format_exc())
-                    
-                    
+           
+        # === Stacked Bar Chart: Tenaga Kesehatan per Wilayah ===
+        try:
+            # Query data tenaga kesehatan per wilayah
+            query_workforce = """
+            SELECT
+                id_wilayah,
+                id_tenaga,
+                nama_tenaga_kerja,
+                SUM(COALESCE(total_tenaga_kerja,0)) AS total_tenaga_kerja
+            FROM mart_annual_workforce_summary
+            WHERE id_tahun = ?
+            GROUP BY id_wilayah, id_tenaga, nama_tenaga_kerja
+            ORDER BY id_wilayah
+            """
+            
+            # Mapping id_tahun ke tahun
+            year_to_id = {
+                2017: 1,
+                2018: 2,
+                2019: 3,
+                2020: 4,
+                2022: 5,
+                2023: 6,
+                2024: 7,
+                2021: 8
+            }
+            
+            # Mapping id_wilayah ke nama wilayah
+            wilayah_mapping = {
+                1: 'Tanah Laut',
+                2: 'Kota Baru',
+                3: 'Banjar',
+                4: 'Barito Kuala',
+                5: 'Tapin',
+                6: 'Hulu Sungai Selatan',
+                7: 'Hulu Sungai Tengah',
+                8: 'Hulu Sungai Utara',
+                9: 'Tabalong',
+                10: 'Balangan',
+                11: 'Kota Banjarmasin',
+                12: 'Kota Banjar Baru'
+            }
+            
+            id_tahun = year_to_id.get(selected_year, 7)  # Default 2024
+            
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_workforce = pd.read_sql_query(query_workforce, conn, params=(id_tahun,))
+            
+            if not df_workforce.empty:
+                # Map id_wilayah ke nama wilayah
+                df_workforce['nama_wilayah'] = df_workforce['id_wilayah'].map(wilayah_mapping)
+                
+                # Pivot data untuk stacked bar chart
+                df_pivot_workforce = df_workforce.pivot(
+                    index='nama_wilayah', 
+                    columns='nama_tenaga_kerja', 
+                    values='total_tenaga_kerja'
+                ).fillna(0)
+                
+                # Definisi warna untuk setiap jenis tenaga kesehatan
+                workforce_colors = {
+                    'Tenaga Kesehatan - Dokter': '#64b5f6',
+                    'Tenaga Kesehatan - Perawat': '#ffb74d',
+                    'Tenaga Kesehatan - Bidan': '#4dd0e1',
+                    'Tenaga Kesehatan - Tenaga Kefarmasian': '#e57373',
+                    'Tenaga Kesehatan - Tenaga Gizi': '#ba68c8',
+                    'Tenaga Kesehatan - Tenaga Kesehatan Masyarakat': '#999999',
+                    'Tenaga Kesehatan - Tenaga Kesehatan Lingkungan': '#9575cd',
+                    'Tenaga Kesehatan - Ahli Teknologi Laboratorium Medik': '#a1887f',
+                    'Jumlah Tenaga Medis': '#2d5016',
+                    'Jumlah Tenaga Kesehatan Psikologi Klinis': '#f06292',
+                    'Jumlah Tenaga Keterapian Fisik': '#90a4ae',
+                    'Jumlah Tenaga Keteknisan Medis': '#4dd0e1',
+                    'Jumlah Tenaga Teknik Biomedika': '#ffb300',
+                    'Jumlah Tenaga Kesehatan Tradisional': '#7986cb'
+                }
+                
+                # Buat figure stacked bar chart
+                fig_workforce = go.Figure()
+                
+                for tenaga in df_pivot_workforce.columns:
+                    short_name = tenaga.replace('Tenaga Kesehatan - ', '').replace('Jumlah ', '')
+                    fig_workforce.add_trace(go.Bar(
+                        name=short_name,
+                        x=df_pivot_workforce.index,
+                        y=df_pivot_workforce[tenaga],
+                        marker_color=workforce_colors.get(tenaga, '#cccccc'),
+                        hovertemplate='%{x}<br>' + short_name + ': %{y:,}<extra></extra>'
+                    ))
+                
+                # Update layout
+                fig_workforce.update_layout(
+                    barmode='stack',
+                    title=dict(
+                        text=f'Tenaga Kesehatan Tahun {selected_year}',
+                        font=dict(size=20, family='Poppins, sans-serif', color='#044335'),
+                        x=0.5,
+                        xanchor='center'
+                    ),
+                    xaxis=dict(
+                        title='',
+                        tickangle=-45,
+                        tickfont=dict(size=11, family='Poppins, sans-serif')
+                    ),
+                    yaxis=dict(
+                        title=dict(
+                            text='Jumlah Tenaga Kesehatan',
+                            font=dict(size=14, family='Poppins, sans-serif')
+                        ),
+                        tickfont=dict(size=12, family='Poppins, sans-serif')
+                    ),
+                    legend=dict(
+                        orientation='v',
+                        yanchor='top',
+                        y=1,
+                        xanchor='left',
+                        x=1.02,
+                        font=dict(size=10, family='Poppins, sans-serif'),
+                        bgcolor='rgba(255,255,255,0.8)'
+                    ),
+                    plot_bgcolor='rgba(245,245,245,0.5)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    margin=dict(l=60, r=250, t=80, b=120),
+                    height=500,
+                    font=dict(family='Poppins, sans-serif')
+                )
+                
+                # Render dalam card putih
+                workforce_html = f"""
+                <div style="background-color: #ffffff; border-radius: 15px; padding: 20px; 
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; 
+                            box-sizing: border-box; margin-top: 10px;">
+                    <style>
+                        .plotly-graph-div, .js-plotly-plot {{ 
+                            font-family: 'Poppins', sans-serif !important; 
+                            background-color: transparent !important; 
+                            width:100% !important; 
+                            height:auto !important; 
+                        }}
+                    </style>
+                    {fig_workforce.to_html(full_html=False, include_plotlyjs='cdn')}
+                </div>
+                """
+                
+                components.html(workforce_html, height=560, scrolling=False)
+                
+        except Exception as e:
+            st.error(f"Gagal membuat chart tenaga kesehatan: {e}")
+            import traceback
+            st.error(traceback.format_exc())
+        
+                            
     # === DIV 2: Kab/Kota (Warna #044335) ===
     with right_col:
-        st.markdown(
+        st.markdown('<div style="margin-top: 150px;"></div>', unsafe_allow_html=True)
+        
+        # === Card Kabupaten/Kota dengan Dropdown dan Peta ===
+        try:
+            # Data koordinat untuk setiap wilayah di Kalimantan Selatan
+            koordinat_wilayah = {
+                'Tanah Laut': {'lat': -3.8333, 'lon': 115.1667, 'zoom': 9},
+                'Kota Baru': {'lat': -3.2833, 'lon': 116.1500, 'zoom': 9},
+                'Banjar': {'lat': -3.3167, 'lon': 115.0000, 'zoom': 9},
+                'Barito Kuala': {'lat': -3.0667, 'lon': 114.6667, 'zoom': 9},
+                'Tapin': {'lat': -2.8667, 'lon': 115.1333, 'zoom': 9},
+                'Hulu Sungai Selatan': {'lat': -2.6167, 'lon': 115.2167, 'zoom': 9},
+                'Hulu Sungai Tengah': {'lat': -2.6000, 'lon': 115.4000, 'zoom': 9},
+                'Hulu Sungai Utara': {'lat': -2.5000, 'lon': 115.1667, 'zoom': 9},
+                'Tabalong': {'lat': -1.8833, 'lon': 115.4333, 'zoom': 9},
+                'Balangan': {'lat': -2.2833, 'lon': 115.6333, 'zoom': 9},
+                'Kota Banjarmasin': {'lat': -3.3194, 'lon': 114.5908, 'zoom': 11},
+                'Kota Banjar Baru': {'lat': -3.4544, 'lon': 114.8378, 'zoom': 11}
+            }
+            
+            # Mapping nama wilayah ke id
+            wilayah_to_id = {v: k for k, v in wilayah_mapping.items()}
+            
+            # Dropdown untuk memilih wilayah
+            st.markdown(
+                '<h3 style="color: white; font-family: Poppins; margin-bottom: 10px;">Kabupaten/Kota</h3>',
+                unsafe_allow_html=True
+            )
+            
+            selected_wilayah = st.selectbox(
+                "Pilih Wilayah",
+                options=list(koordinat_wilayah.keys()),
+                index=2,  # Default Banjar
+                key='selected_wilayah',
+                label_visibility='collapsed'
+            )
+            
+            # Ambil data untuk wilayah yang dipilih
+            id_wilayah_selected = wilayah_to_id.get(selected_wilayah, 3)
+            id_tahun = year_to_id.get(selected_year, 7)
+            
+            # Query total kasus untuk wilayah terpilih
+            query_wilayah_cases = """
+            SELECT SUM(COALESCE(total_cases,0)) AS total_cases
+            FROM mart_annual_case_summary
+            WHERE tahun = ? AND nama_wilayah = ?
             """
-            <div class="dashboard-container card-kabkota">
-                <p class="card-title">Kab/Kota</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            
+            # Query total tenaga untuk wilayah terpilih
+            query_wilayah_workforce = """
+            SELECT SUM(COALESCE(total_tenaga_kerja,0)) AS total_workforce
+            FROM mart_annual_workforce_summary
+            WHERE id_tahun = ? AND id_wilayah = ?
+            """
+            
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_wilayah_cases = pd.read_sql_query(
+                    query_wilayah_cases, 
+                    conn, 
+                    params=(selected_year, selected_wilayah)
+                )
+                df_wilayah_workforce = pd.read_sql_query(
+                    query_wilayah_workforce, 
+                    conn, 
+                    params=(id_tahun, id_wilayah_selected)
+                )
+            
+            total_cases_wilayah = int(df_wilayah_cases['total_cases'].iloc[0]) if not df_wilayah_cases.empty else 0
+            total_workforce_wilayah = int(df_wilayah_workforce['total_workforce'].iloc[0]) if not df_wilayah_workforce.empty else 0
+            
+            # Ambil koordinat wilayah yang dipilih
+            coords = koordinat_wilayah[selected_wilayah]
+            
+            # Inisialisasi peta dengan zoom ke Kalimantan Selatan
+            m = folium.Map(
+                location=[coords['lat'], coords['lon']],
+                zoom_start=coords['zoom'],
+                tiles='OpenStreetMap',
+                scrollWheelZoom=False,
+                dragging=True
+            )
+            
+            # Tambahkan marker untuk wilayah yang dipilih
+            folium.Marker(
+                location=[coords['lat'], coords['lon']],
+                popup=f"<b>{selected_wilayah}</b><br>Kasus: {total_cases_wilayah:,}<br>Tenaga: {total_workforce_wilayah:,}",
+                tooltip=selected_wilayah,
+                icon=folium.Icon(color='blue', icon='info-sign')
+            ).add_to(m)
+            
+            # Tampilkan peta dalam card putih
+            st.markdown(
+                """
+                <div style="background-color: white; border-radius: 15px; padding: 15px; 
+                            box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px;">
+                """,
+                unsafe_allow_html=True
+            )
+            
+            # Render peta
+            st_folium(m, width=None, height=300, returned_objects=[])
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Card informasi statistik
+            st.markdown(
+                f"""
+                <div style="background-color: #720709; border-radius: 15px; padding: 20px; 
+                            margin-top: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="background-color: #4dd0e1; width: 60px; height: 60px; 
+                                        border-radius: 50%; display: flex; align-items: center; 
+                                        justify-content: center; margin: 0 auto 10px;">
+                                <span style="font-size: 24px;">📊</span>
+                            </div>
+                            <div style="color: white; font-size: 1.8rem; font-weight: bold; 
+                                        font-family: 'Poppins', sans-serif;">
+                                {total_cases_wilayah:,}
+                            </div>
+                            <div style="color: #ffb74d; font-size: 0.9rem; font-family: 'Poppins', sans-serif;">
+                                Kasus Penyakit
+                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="background-color: #7e57c2; width: 60px; height: 60px; 
+                                        border-radius: 50%; display: flex; align-items: center; 
+                                        justify-content: center; margin: 0 auto 10px;">
+                                <span style="font-size: 24px;">👨‍⚕️</span>
+                            </div>
+                            <div style="color: white; font-size: 1.8rem; font-weight: bold; 
+                                        font-family: 'Poppins', sans-serif;">
+                                {total_workforce_wilayah:,}
+                            </div>
+                            <div style="color: #ffb74d; font-size: 0.9rem; font-family: 'Poppins', sans-serif;">
+                                Tenaga Kesehatan
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            
+        except Exception as e:
+            st.error(f"Gagal membuat peta wilayah: {e}")
+            import traceback
+            st.error(traceback.format_exc())
+        
+        
+            st.markdown(
+                """
+                <div class="dashboard-container card-kabkota">
+                    <p class="card-title">Kab/Kota</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
 # --- JALANKAN APLIKASI ---
 if __name__ == "__main__":
