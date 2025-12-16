@@ -511,7 +511,7 @@ def main_app():
                 components.html(summary_html, height=290, scrolling=False)
         except Exception as e:
             st.error(f"Gagal membuat summary cards: {e}")
-                    
+                   
         # === Stacked Bar Chart: Kasus Penyakit per Wilayah ===
         try:
             # Query data kasus penyakit per wilayah dan jenis penyakit
@@ -777,6 +777,103 @@ def main_app():
             st.error(f"Gagal membuat chart tenaga kesehatan: {e}")
             import traceback
             st.error(traceback.format_exc())
+            
+        # === Scatter Plot Korelasi ===
+        try:
+            # Query data untuk scatter plot
+            query_corr = """
+            SELECT
+                nama_wilayah,
+                SUM(COALESCE(total_workforce, 0)) AS total_workforce,
+                SUM(COALESCE(total_cases, 0)) AS total_cases
+            FROM mart_workload_ratio
+            WHERE tahun = ?
+            GROUP BY nama_wilayah
+            """
+            
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_corr = pd.read_sql_query(query_corr, conn, params=(selected_year,))
+
+            # Pastikan ada cukup data untuk korelasi
+            if len(df_corr) < 3:
+                st.warning(f"Tidak cukup data wilayah (hanya {len(df_corr)}) untuk menghitung korelasi yang bermakna pada tahun {selected_year}.")
+            else:
+                # Hitung korelasi
+                correlation = df_corr['total_workforce'].corr(df_corr['total_cases'])
+                
+                # Interpretasi korelasi
+                if abs(correlation) < 0.3:
+                    interpretation = "Lemah"
+                elif 0.3 <= abs(correlation) <= 0.7:
+                    interpretation = "Sedang"
+                else:
+                    interpretation = "Kuat"
+
+                # Buat scatter plot
+                fig_corr = px.scatter(
+                    df_corr,
+                    x='total_workforce',
+                    y='total_cases',
+                    text='nama_wilayah',
+                    trendline='ols',
+                    trendline_color_override='#ff6b6b'
+                )
+
+                # Update traces untuk styling
+                fig_corr.update_traces(
+                    marker=dict(color='#4dd0e1', size=12),
+                    textposition='top center',
+                    textfont=dict(family='Poppins, sans-serif', size=10)
+                )
+
+                # Update layout
+                fig_corr.update_layout(
+                    title=dict(
+                        text=f"Korelasi Tenaga Kesehatan vs Kasus ({selected_year})",
+                        font=dict(size=20, family='Poppins, sans-serif', color='#044335'),
+                        x=0.5,
+                        xanchor='center'
+                    ),
+                    xaxis_title="Total Tenaga Kesehatan",
+                    yaxis_title="Total Kasus Penyakit",
+                    height=500,
+                    plot_bgcolor='rgba(245,245,245,0.5)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font=dict(family='Poppins, sans-serif'),
+                    margin=dict(l=60, r=40, t=80, b=60),
+                    annotations=[
+                        dict(
+                            x=0.98,
+                            y=0.98,
+                            xref='paper',
+                            yref='paper',
+                            text=f"<b>Korelasi (r): {correlation:.2f}</b><br><i>({interpretation})</i>",
+                            showarrow=False,
+                            align='right',
+                            bgcolor='rgba(255, 255, 255, 0.8)',
+                            bordercolor='#044335',
+                            borderwidth=1,
+                            font=dict(family='Poppins, sans-serif')
+                        )
+                    ]
+                )
+
+                # Render dalam card putih
+                corr_html = f"""
+                <div style="background-color: #ffffff; border-radius: 15px; padding: 20px; 
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; 
+                            box-sizing: border-box; margin-top: 20px;">
+                    <style>
+                        .plotly-graph-div, .js-plotly-plot {{ font-family: 'Poppins', sans-serif !important; }}
+                    </style>
+                    {fig_corr.to_html(full_html=False, include_plotlyjs='cdn')}
+                </div>
+                """
+                components.html(corr_html, height=540, scrolling=False)
+
+        except Exception as e:
+            st.error(f"Gagal membuat scatter plot korelasi: {e}")
+            st.error(traceback.format_exc())
         
                             
     # === DIV 2: Kab/Kota (Warna #044335) ===
@@ -864,7 +961,7 @@ def main_app():
                 )
                 selected_wilayah = st.selectbox(
                     "Pilih Wilayah",
-                    options=list(koordinat_wilayah.keys()),
+                    options=["Semua Wilayah"] + list(koordinat_wilayah.keys()),
                     index=1,  # Default ke tahun terbaru
                     key='selected_wilayah',
                     label_visibility='collapsed'
@@ -938,7 +1035,7 @@ def main_app():
             # Card informasi statistik
             st.markdown(
                 f"""
-                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -23px;
+                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -23px; margin-bottom: 15px;
                             box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
                     <div style="display: flex; justify-content: space-around; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 15px;">
@@ -982,20 +1079,40 @@ def main_app():
             # === Pie Chart Kategori (Kasus Penyakit atau Tenaga Kesehatan) ===
             st.markdown(
                 """
-                <div style="background-color: yellow; border-radius: 15px; padding: 20px; 
-                            box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px;">
+                <div style="position: relative; min-height: 2px;">
+                    <div style="background-color: white; border-radius: 15px; padding: 2px; 
+                                box-shadow: 0 8px 20px rgba(0,0,0,0.12); 
+                                position: absolute;top: 0; left: 0; right: 0; 
+                                height: 280px; z-index: 0;">
+                    </div>
+                </div>
                 """,
                 unsafe_allow_html=True
             )
-
+                  
             # Dropdown untuk memilih kategori
             col_cat1, col_cat2 = st.columns([1.5, 2])
             with col_cat1:
                 st.markdown(
-                    '<h4 style="color: #044335; font-family: Poppins; margin: 0; padding-top: 5px;">Kategori</h4>',
+                    '<h4 style="color: #044335; font-family: Poppins; margin-left: 15px; padding-top: 15px;">Kategori</h4>',
                     unsafe_allow_html=True
                 )
             with col_cat2:
+                st.markdown(
+                    """
+                    <style>
+                    /* Kurangi padding selectbox */
+                    div[data-testid="stSelectbox"] {
+                        margin-bottom: -1px !important;
+                    }
+                    /* Border selectbox */
+                    div[data-testid="stSelectbox"] > div > div {
+                        border: 2px solid black !important;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
                 kategori_pilihan = st.selectbox(
                     "Pilih Kategori",
                     options=['Kasus Penyakit', 'Tenaga Kesehatan'],
@@ -1003,7 +1120,7 @@ def main_app():
                     key='kategori_chart',
                     label_visibility='collapsed'
                 )
-
+                
             # Query dan visualisasi berdasarkan kategori yang dipilih
             if kategori_pilihan == 'Kasus Penyakit':
                 # Query untuk detail kasus penyakit per wilayah
@@ -1051,15 +1168,15 @@ def main_app():
                             y=0.5,
                             xanchor='left',
                             x=1.02,
-                            font=dict(size=10, family='Poppins')
+                            font=dict(color='black', size=10, family='Poppins')
                         ),
-                        margin=dict(l=20, r=150, t=20, b=20),
-                        height=300,
+                        margin=dict(l=15, r=150, t=10, b=20),
+                        height=200,
                         paper_bgcolor='rgba(0,0,0,0)',
                         font=dict(family='Poppins')
                     )
                     
-                    st.plotly_chart(fig_pie, use_container_width=True)
+                    st.plotly_chart(fig_pie, width='stretch')
                 else:
                     st.info("Tidak ada data kasus penyakit untuk wilayah dan tahun ini.")
 
@@ -1067,7 +1184,10 @@ def main_app():
                 # Query untuk detail tenaga kesehatan per wilayah
                 query_pie = """
                 SELECT
-                    nama_tenaga_kerja,
+                    REPLACE(
+                        REPLACE(nama_tenaga_kerja, 'Tenaga Kesehatan - ', ''),
+                        'Tenaga Kesehatan -', ''
+                    ) AS nama_tenaga_kerja,
                     SUM(COALESCE(total_tenaga_kerja,0)) AS total
                 FROM mart_annual_workforce_summary
                 WHERE id_tahun = ? AND id_wilayah = ?
@@ -1106,25 +1226,127 @@ def main_app():
                             y=0.5,
                             xanchor='left',
                             x=1.02,
-                            font=dict(size=10, family='Poppins')
+                            font=dict(color='black', size=10, family='Poppins')
                         ),
-                        margin=dict(l=20, r=150, t=20, b=20),
-                        height=300,
+                        margin=dict(l=15, r=150, t=10, b=20),
+                        height=200,
                         paper_bgcolor='rgba(0,0,0,0)',
                         font=dict(family='Poppins')
                     )
                     
-                    st.plotly_chart(fig_pie, use_container_width=True)
+                    st.plotly_chart(fig_pie, width='stretch')
                 else:
                     st.info("Tidak ada data tenaga kesehatan untuk wilayah dan tahun ini.")
-
-            st.markdown('</div>', unsafe_allow_html=True)
+        
             
         except Exception as e:
             st.error(f"Gagal membuat peta wilayah: {e}")
             import traceback
             st.error(traceback.format_exc())
         
+        
+        # === Card Metrik Beban Kerja ===
+        try:
+            # Ambil tahun dan wilayah yang dipilih
+            selected_year_workload = st.session_state.selected_year
+            selected_wilayah_workload = st.session_state.get('selected_wilayah', 'Kota Banjarmasin') # Default jika belum ada
+
+            # Siapkan query berdasarkan pilihan wilayah
+            if selected_wilayah_workload == "Semua Wilayah":
+                query_workload = """
+                SELECT
+                    SUM(COALESCE(total_workforce, 0)) AS total_workforce,
+                    SUM(COALESCE(total_cases, 0)) AS total_cases
+                FROM mart_workload_ratio
+                WHERE tahun = ?
+                """
+                params_workload = (selected_year_workload,)
+            else:
+                query_workload = """
+                SELECT
+                    total_workforce,
+                    total_cases
+                FROM mart_workload_ratio
+                WHERE tahun = ? AND nama_wilayah = ?
+                """
+                params_workload = (selected_year_workload, selected_wilayah_workload)
+
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_workload = pd.read_sql_query(query_workload, conn, params=params_workload)
+
+            if not df_workload.empty and not df_workload.isnull().all().all():
+                total_cases_workload = df_workload['total_cases'].iloc[0]
+                total_workforce_workload = df_workload['total_workforce'].iloc[0]
+
+                # Perhitungan Rasio dan Status
+                rasio_pasien = total_cases_workload / total_workforce_workload if total_workforce_workload > 0 else 0
+                jam_kerja = 40  # Asumsi dari UTS
+
+                if rasio_pasien <= 8:
+                    status = "NORMAL"
+                    icon_status = "🟢"
+                    color_status = "#4ade80"
+                elif rasio_pasien <= 12:
+                    status = "MODERATE"
+                    icon_status = "🟡"
+                    color_status = "#fbbf24"
+                else:
+                    status = "TINGGI"
+                    icon_status = "🔴"
+                    color_status = "#ef4444"
+
+                rasio_text = f"{rasio_pasien:.1f} : 1" if total_workforce_workload > 0 else "N/A"
+
+                # HTML untuk Card Metrik
+                workload_card_html = f"""
+                <div style="background: linear-gradient(135deg, #00776b 0%, #044335 100%); 
+                            border-radius: 15px; padding: 25px; margin-top: 10px;
+                            box-shadow: 0 8px 20px rgba(0,0,0,0.12); display: flex; 
+                            font-family: 'Poppins', sans-serif; gap: 10px;">
+                    <!-- Kolom 1: Rasio Pasien per Nakes -->
+                    <div style="flex: 1; display: flex; align-items: center; gap: 10px;">                        
+                        <div>
+                            <div style="color: #ffb74d; font-size: 1.5rem; font-weight: bold;">{rasio_text}</div>
+                            <div style="color: white; font-size: 0.9rem;">Rasio Pasien per Nakes</div>
+                            <div style="color: white; font-size: 0.85rem; opacity: 0.8;">(Ideal: 6:1)</div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom 2: Jam Kerja Rata-rata -->
+                    <div style="flex: 1; display: flex; align-items: center; gap: 10px; border-left: 1px solid rgba(255,255,255,0.2); border-right: 1px solid rgba(255,255,255,0.2); padding: 0 15px;">                        
+                        <div>
+                            <div style="color: #ffb74d; font-size: 1.5rem; font-weight: bold;">{jam_kerja} <span style="font-size: 1rem; font-weight: normal;">jam/minggu</span></div>
+                            <div style="color: white; font-size: 0.9rem;">Jam Kerja Rata-rata</div>
+                            <div style="color: white; font-size: 0.85rem; opacity: 0.8;">(Standar: 40 jam)</div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom 3: Status Beban Kerja -->
+                    <div style="flex: 1; display: flex; align-items: center; gap: 10px; margin-left: 15px;">                        
+                        <div>
+                            <div style="font-size: 1.6rem; text-align: center; ">{icon_status}</div>
+                            <div style="color: {color_status}; text-align: center; font-size: 1.4rem; font-weight: bold;">{status}</div>
+                            <div style="color: white; font-size: 1.1rem; text-align: center;">Status Beban</div>
+                        </div>
+                    </div>
+                </div>
+                """
+                components.html(workload_card_html, height=180)
+            else:
+                st.markdown("""
+                    <div style="background: linear-gradient(135deg, #00776b 0%, #044335 100%); 
+                                border-radius: 15px; padding: 25px; margin-top: 20px;
+                                box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center;
+                                color: white; font-family: 'Poppins', sans-serif; height: 180px; display: flex;
+                                align-items: center; justify-content: center;">
+                        Data beban kerja tidak tersedia untuk periode atau wilayah ini.
+                    </div>
+                """, unsafe_allow_html=True)
+
+        except Exception as e:
+            st.error(f"Gagal membuat Card Metrik Beban Kerja: {e}")
+            st.error(traceback.format_exc())
+ 
         
             st.markdown(
                 """
