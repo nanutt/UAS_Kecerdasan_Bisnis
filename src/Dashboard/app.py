@@ -200,7 +200,7 @@ st.markdown(
     /* Catatan: selector untuk judul chart/metric/tabel dihilangkan karena
        markup saat ini tidak menggunakan elemen-elemen tersebut. Jika nanti
        ditambahkan kembali, styling ini bisa dikembalikan. */
-    
+
     </style>
     """,
     unsafe_allow_html=True
@@ -285,7 +285,7 @@ def main_app():
 
     # === LAYOUT RESPONSIF DENGAN KOLOM STREAMLIT ===
     # Buat dua kolom utama, spacer tidak lagi diperlukan karena st.sidebar
-    chart_col, right_col = st.columns([2.4, 1], gap="small")
+    chart_col, right_col = st.columns([2.4, 1], gap="medium")
 
     # === Grafi Tren di kolom tengah (sekitar 50% layar) ===
     with chart_col:
@@ -781,7 +781,6 @@ def main_app():
                             
     # === DIV 2: Kab/Kota (Warna #044335) ===
     with right_col:
-        st.markdown('<div style="margin-top: 150px;"></div>', unsafe_allow_html=True)
         
         # === Card Kabupaten/Kota dengan Dropdown dan Peta ===
         try:
@@ -805,19 +804,72 @@ def main_app():
             wilayah_to_id = {v: k for k, v in wilayah_mapping.items()}
             
             # Dropdown untuk memilih wilayah
-            st.markdown(
-                '<h3 style="color: white; font-family: Poppins; margin-bottom: 10px;">Kabupaten/Kota</h3>',
-                unsafe_allow_html=True
-            )
-            
-            selected_wilayah = st.selectbox(
-                "Pilih Wilayah",
-                options=list(koordinat_wilayah.keys()),
-                index=2,  # Default Banjar
-                key='selected_wilayah',
-                label_visibility='collapsed'
-            )
-            
+            col1, col2 = st.columns([2, 1.3])
+            with col1:
+                st.markdown("""
+                        <div style="background-color: #044335; border-radius: 15px 15px 0 0; padding: 20px 25px 15px 25px; margin-right: -199px; margin-bottom: -20px;">
+                            <h4 style="color: white; font-family: Poppins; margin: 0; padding: 0;">Kabupaten/Kota</h4>
+                        </div>
+                    """, unsafe_allow_html=True
+                    )
+            with col2:
+                st.markdown(
+                    """
+                    <style>
+                    /* Styling untuk selectbox */
+                    div[data-testid="stSelectbox"] > div > div {
+                        background-color: white !important;
+                        color: grey !important;
+                        border-radius: 10px !important;
+                        border: none !important;
+                        margin-left: -20px !important;
+                    }
+                    
+                    /* Input field selectbox */
+                    div[data-testid="stSelectbox"] input {
+                        color: grey !important;
+                    }
+                    
+                    /* Selected value */
+                    div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+                        background-color: white !important;
+                        color: grey !important;
+                    }
+                    
+                    /* Dropdown arrow */
+                    div[data-testid="stSelectbox"] svg {
+                        fill: grey !important;
+                    }
+                    
+                    /* Dropdown menu popup */
+                    div[data-baseweb="popover"] {
+                        background-color: white !important;
+                    }
+                    
+                    div[data-baseweb="popover"] ul {
+                        background-color: white !important;
+                    }
+                    
+                    div[data-baseweb="popover"] li {
+                        background-color: white !important;
+                        color: grey !important;
+                    }
+                    
+                    div[data-baseweb="popover"] li:hover {
+                        background-color: #00776b !important;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+                selected_wilayah = st.selectbox(
+                    "Pilih Wilayah",
+                    options=list(koordinat_wilayah.keys()),
+                    index=1,  # Default ke tahun terbaru
+                    key='selected_wilayah',
+                    label_visibility='collapsed'
+                )
+                       
             # Ambil data untuk wilayah yang dipilih
             id_wilayah_selected = wilayah_to_id.get(selected_wilayah, 3)
             id_tahun = year_to_id.get(selected_year, 7)
@@ -874,56 +926,199 @@ def main_app():
             # Tampilkan peta dalam card putih
             st.markdown(
                 """
-                <div style="background-color: white; border-radius: 15px; padding: 15px; 
-                            box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px;">
+                <div style="background-color: white; padding: 15px; margin-top: -10px; 
+                            box-shadow: 0 8px 20px rgba(0,0,0,0.12); ">
                 """,
                 unsafe_allow_html=True
             )
-            
+        
             # Render peta
             st_folium(m, width=None, height=300, returned_objects=[])
-            
-            st.markdown('</div>', unsafe_allow_html=True)
             
             # Card informasi statistik
             st.markdown(
                 f"""
-                <div style="background-color: #720709; border-radius: 15px; padding: 20px; 
-                            margin-top: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
+                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -23px;
+                            box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
                     <div style="display: flex; justify-content: space-around; align-items: center;">
-                        <div style="text-align: center;">
-                            <div style="background-color: #4dd0e1; width: 60px; height: 60px; 
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background-color: #4dd0e1; width: 25px; height: 25px; 
+                                        border-radius: 50%; display: flex; align-items:center; 
+                                        justify-content: left; flex-shrink: 0; ">
+                                <span style="font-size: 4px;"></span>
+                            </div>
+                            <div style="text-align: left;">
+                                <div style="color: white; font-size: 1rem; font-weight: bold; 
+                                            font-family: 'Poppins', sans-serif;">
+                                    {total_cases_wilayah:,}
+                                </div>
+                                <div style="color: #ffb74d; font-size: 0.9rem; font-family: 'Poppins', sans-serif; margin-top: -6px;">
+                                    Kasus Penyakit
+                                </div>
+                            </div>
+                        </div>                                            
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background-color: #7e57c2; width: 25px; height: 25px; 
                                         border-radius: 50%; display: flex; align-items: center; 
-                                        justify-content: center; margin: 0 auto 10px;">
-                                <span style="font-size: 24px;">📊</span>
+                                        justify-content: center; flex-shrink: 0;">
+                                <span style="font-size: 4px;"></span>
                             </div>
-                            <div style="color: white; font-size: 1.8rem; font-weight: bold; 
-                                        font-family: 'Poppins', sans-serif;">
-                                {total_cases_wilayah:,}
+                            <div style="text-align: left;">
+                                <div style="color: white; font-size: 1rem; font-weight: bold; 
+                                            font-family: 'Poppins', sans-serif;">
+                                    {total_workforce_wilayah:,}
+                                </div>
+                                <div style="color: #ffb74d; font-size: 0.9rem; font-family: 'Poppins', sans-serif; margin-top: -6px;">
+                                    Tenaga Kesehatan
+                                </div>
                             </div>
-                            <div style="color: #ffb74d; font-size: 0.9rem; font-family: 'Poppins', sans-serif;">
-                                Kasus Penyakit
-                            </div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="background-color: #7e57c2; width: 60px; height: 60px; 
-                                        border-radius: 50%; display: flex; align-items: center; 
-                                        justify-content: center; margin: 0 auto 10px;">
-                                <span style="font-size: 24px;">👨‍⚕️</span>
-                            </div>
-                            <div style="color: white; font-size: 1.8rem; font-weight: bold; 
-                                        font-family: 'Poppins', sans-serif;">
-                                {total_workforce_wilayah:,}
-                            </div>
-                            <div style="color: #ffb74d; font-size: 0.9rem; font-family: 'Poppins', sans-serif;">
-                                Tenaga Kesehatan
-                            </div>
-                        </div>
+                        </div>                        
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+         
+            # === Pie Chart Kategori (Kasus Penyakit atau Tenaga Kesehatan) ===
+            st.markdown(
+                """
+                <div style="background-color: yellow; border-radius: 15px; padding: 20px; 
+                            box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px;">
+                """,
+                unsafe_allow_html=True
+            )
+
+            # Dropdown untuk memilih kategori
+            col_cat1, col_cat2 = st.columns([1.5, 2])
+            with col_cat1:
+                st.markdown(
+                    '<h4 style="color: #044335; font-family: Poppins; margin: 0; padding-top: 5px;">Kategori</h4>',
+                    unsafe_allow_html=True
+                )
+            with col_cat2:
+                kategori_pilihan = st.selectbox(
+                    "Pilih Kategori",
+                    options=['Kasus Penyakit', 'Tenaga Kesehatan'],
+                    index=0,
+                    key='kategori_chart',
+                    label_visibility='collapsed'
+                )
+
+            # Query dan visualisasi berdasarkan kategori yang dipilih
+            if kategori_pilihan == 'Kasus Penyakit':
+                # Query untuk detail kasus penyakit per wilayah
+                query_pie = """
+                SELECT
+                    REPLACE(
+                        REPLACE(nama_penyakit, 'Jumlah Kasus Penyakit - ', ''),
+                        'Jumlah Kasus Penyakit -', ''
+                    ) AS nama_penyakit,
+                    SUM(COALESCE(total_cases,0)) AS total
+                FROM mart_annual_case_summary
+                WHERE tahun = ? AND nama_wilayah = ?
+                GROUP BY nama_penyakit
+                ORDER BY total DESC
+                LIMIT 10
+                """
+                
+                with sqlite3.connect(MART_DB_FILE) as conn:
+                    df_pie = pd.read_sql_query(
+                        query_pie, 
+                        conn, 
+                        params=(selected_year, selected_wilayah)
+                    )
+                
+                if not df_pie.empty and df_pie['total'].sum() > 0:
+                    # Warna untuk pie chart kasus penyakit
+                    pie_colors = ['#4dd0e1', '#7e57c2', '#e57373', '#64b5f6', '#ffb74d', 
+                                '#ba68c8', '#4db6ac', '#90a4ae', '#f06292', '#fff176']
+                    
+                    fig_pie = go.Figure(data=[go.Pie(
+                        labels=df_pie['nama_penyakit'],
+                        values=df_pie['total'],
+                        marker=dict(colors=pie_colors[:len(df_pie)]),
+                        textinfo='percent',
+                        textposition='inside',
+                        hovertemplate='%{label}<br>%{value:,} kasus<br>%{percent}<extra></extra>',
+                        hole=0
+                    )])
+                    
+                    fig_pie.update_layout(
+                        showlegend=True,
+                        legend=dict(
+                            orientation='v',
+                            yanchor='middle',
+                            y=0.5,
+                            xanchor='left',
+                            x=1.02,
+                            font=dict(size=10, family='Poppins')
+                        ),
+                        margin=dict(l=20, r=150, t=20, b=20),
+                        height=300,
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(family='Poppins')
+                    )
+                    
+                    st.plotly_chart(fig_pie, use_container_width=True)
+                else:
+                    st.info("Tidak ada data kasus penyakit untuk wilayah dan tahun ini.")
+
+            else:  # Tenaga Kesehatan
+                # Query untuk detail tenaga kesehatan per wilayah
+                query_pie = """
+                SELECT
+                    nama_tenaga_kerja,
+                    SUM(COALESCE(total_tenaga_kerja,0)) AS total
+                FROM mart_annual_workforce_summary
+                WHERE id_tahun = ? AND id_wilayah = ?
+                GROUP BY nama_tenaga_kerja
+                ORDER BY total DESC
+                LIMIT 10
+                """
+                
+                with sqlite3.connect(MART_DB_FILE) as conn:
+                    df_pie = pd.read_sql_query(
+                        query_pie, 
+                        conn, 
+                        params=(id_tahun, id_wilayah_selected)
+                    )
+                
+                if not df_pie.empty and df_pie['total'].sum() > 0:
+                    # Warna untuk pie chart tenaga kesehatan
+                    pie_colors = ['#64b5f6', '#ffb74d', '#4dd0e1', '#e57373', '#ba68c8', 
+                                '#999999', '#9575cd', '#a1887f', '#2d5016', '#f06292']
+                    
+                    fig_pie = go.Figure(data=[go.Pie(
+                        labels=df_pie['nama_tenaga_kerja'],
+                        values=df_pie['total'],
+                        marker=dict(colors=pie_colors[:len(df_pie)]),
+                        textinfo='percent',
+                        textposition='inside',
+                        hovertemplate='%{label}<br>%{value:,} tenaga<br>%{percent}<extra></extra>',
+                        hole=0
+                    )])
+                    
+                    fig_pie.update_layout(
+                        showlegend=True,
+                        legend=dict(
+                            orientation='v',
+                            yanchor='middle',
+                            y=0.5,
+                            xanchor='left',
+                            x=1.02,
+                            font=dict(size=10, family='Poppins')
+                        ),
+                        margin=dict(l=20, r=150, t=20, b=20),
+                        height=300,
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(family='Poppins')
+                    )
+                    
+                    st.plotly_chart(fig_pie, use_container_width=True)
+                else:
+                    st.info("Tidak ada data tenaga kesehatan untuk wilayah dan tahun ini.")
+
+            st.markdown('</div>', unsafe_allow_html=True)
             
         except Exception as e:
             st.error(f"Gagal membuat peta wilayah: {e}")
