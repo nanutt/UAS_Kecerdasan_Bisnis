@@ -38,8 +38,7 @@ st.markdown(
         justify-content: center;
         margin-top: -40px !important;
         margin-right: -70px !important;
-        border-radius: 20px;
-        
+        border-radius: 20px;        
     }
     
     .card-dashboard {
@@ -50,7 +49,7 @@ st.markdown(
         background-image: linear-gradient(to right, #00776b, #0B634F, #044335 60%); /* Hijau Gelap */
         display: flex;
         align-items: center;
-        background-size: 400% 400%; /* Kunci animasi */
+        background-size: 400% 400%;
         animation: moveGradient 5s ease infinite;
         position: fixed;
         top: 0;
@@ -68,18 +67,18 @@ st.markdown(
     }
     
     h2.main-title {
-        font-size: 2.5rem !important; /* Memaksa Ukuran (32-40px) */
+        font-size: 2.5rem !important; 
         font-weight: bold !important;
-        color: white !important;      /* MEMAKSA WARNA PUTIH */
-        margin: 0 !important;         /* Menghilangkan margin bawaan */
+        color: white !important;
+        margin: 0 !important;        
         padding: 0 !important;
         line-height: 1.0 !important;
     }
 
     h4.sub-title { 
-        font-size: 1.25rem !important; /* Memaksa Ukuran (20px) */
+        font-size: 1.25rem !important; 
         font-weight: 500 !important;
-        color: #ffb74d !important;    /* MEMAKSA WARNA ORANYE */
+        color: #ffb74d !important;    
         margin: -5px 0 0 0 !important;         
         padding: 0 !important;
         line-height: 1.0 !important;
@@ -96,14 +95,13 @@ st.markdown(
     }
         
     [data-testid="stSidebar"] > div:first-child {    
-        top: 150px; /* Jarak dari atas layar */
+        top: 150px;
         width: 327px;    
-        height: calc(100vh - 160px); /* Tinggi sidebar, sisakan ruang di bawah */    
+        height: calc(100vh - 150px);    
         background-color: #044335;    
         border-radius: 0px 20px 20px 0px;    
-        padding-top: 10px; /* Kurangi padding karena 'top' sudah diatur */    
+        padding-top: 10px;  
     }
-    
     
     .sidebar-title {
         color: white; 
@@ -119,60 +117,90 @@ st.markdown(
         color: #ffffff !important;
     }
 
-    .sidebar-list {
-        list-style: none; /* Hapus bullet point bawaan */
-        padding: 0;      /* Hapus padding kiri bawaan UL */
-        margin: 0;       /* Hapus margin bawaan UL */
-        margin-bottom: 20px; /* Tambahkan jarak dari elemen di bawahnya */
-        margin-left: 50px; /* Sesuaikan posisi daftar ke kiri */
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .sidebar-item {
-        color: white; 
-        margin-bottom: 10px; /* Jarak antar item daftar */
-        display: flex; 
-        align-items: center;
-    }
-    
-    .item-text {
-        color: white;
-        font-size: 1rem;
-        font-family: 'Poppins';
-    }
-
     /* Styling untuk Ikon Kategori di dalam Li */
     .category-icon {
-        font-size: 1.5rem; /* Ukuran ikon dan panah */
+        font-size: 1.5rem; 
         margin-right: 10px;
         font-weight: bold;
     }
     
-    /* Styling untuk radio button tahun di sidebar */
-    div[role="radiogroup"] {
-        padding-left: 35px !important; /* Align with categories */
+    /* Styling Radio Button Tahun - Checkbox Style */
+    @keyframes checkIn {
+       0% { transform: translate(-50%, -50%) scale(0); }
+       50% { transform: translate(-50%, -50%) scale(1.2); }
+       100% { transform: translate(-50%, -50%) scale(1); }
     }
 
-    /* Style each radio item's label */
-    div[role="radiogroup"] label {
-        display: flex !important;
-        align-items: center !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        margin-bottom: 10px !important; /* Space between items */
+   /* Styling untuk radio button container */
+   div[data-testid="stSidebar"] div[role="radiogroup"] {
+       padding-left: 50px !important;
+       margin-top: 10px !important;
+   }
+
+   /* Style untuk setiap radio item */
+   div[data-testid="stSidebar"] div[role="radiogroup"] label {
+       display: flex !important;
+       align-items: center !important;
+       margin-bottom: 12px !important;
+       cursor: pointer !important;
+       color: white !important;
+       font-size: 1rem !important;
+       font-family: 'Poppins', sans-serif !important;
+       transition: all 0.2s ease !important;
+   }
+
+   /* Hover effect pada label */
+   div[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+       color: #4dd0e1 !important;
+   }
+
+   /* Style radio button (checkbox visual) */
+   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] {
+       width: 22px !important;
+       height: 22px !important;
+       margin-right: 15px !important;
+       cursor: pointer !important;
+       appearance: none !important;
+       -webkit-appearance: none !important;
+       border: 2px solid white !important;
+       border-radius: 0px !important; /* Mengubah menjadi kotak tajam */
+       background-color: transparent !important;
+       position: relative !important;
+       transition: all 0.3s ease !important;
+   }
+
+   /* Radio button saat di-hover */
+   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:hover {
+       border-color: #4dd0e1 !important;
+       box-shadow: 0 0 8px rgba(77, 208, 225, 0.4) !important;
+   }
+
+   /* Radio button saat dipilih (checked) */
+   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:checked {
+       background-color: #4dd0e1 !important;
+       border-color: #4dd0e1 !important;
+   }
+
+   /* Checkmark icon saat dipilih */
+   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:checked::after {
+       content: "✓" !important;
+       position: absolute !important;
+       top: 50% !important;
+       left: 50% !important;
+       transform: translate(-50%, -50%) !important;
+       color: #044335 !important;
+       font-size: 14px !important;
+       font-weight: bold !important;
+       animation: checkIn 0.2s ease !important;
+   }
+
+   /* Hilangkan outline default */
+   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:focus {
+       outline: none !important;
+       box-shadow: 0 0 0 3px rgba(77, 208, 225, 0.3) !important;
     }
 
-    /* Style the radio input button itself */
-    div[role="radiogroup"] input[type="radio"] {
-        width: 20px !important;
-        height: 20px !important;
-        cursor: pointer !important;
-        accent-color: #4dd0e1 !important; /* Apply user's desired color */
-        margin-right: 15px !important; /* Space between button and text */
-    }
-    
     /* Buat Grafik tren */
-    /* Container Grafik Tren */
     .trend-chart-container {
         background-color: white;
         border-radius: 5px;
@@ -215,7 +243,6 @@ MART_PATH = DATA_ROOT / "04_data_mart"
 MART_DB_FILE = MART_PATH / "mart_health_summary.db"
 
 # --- VERIFIKASI ---
-# Cetak path yang dihasilkan untuk memastikan kebenaran sebelum digunakan
 print(f"PROJECT_ROOT ditentukan sebagai: {PROJECT_ROOT.resolve()}")
 print(f"Path Data Mart yang dihasilkan: {MART_DB_FILE.resolve()}")
  
@@ -243,8 +270,7 @@ def main_app():
             <img 
                 src="data:image/png;base64,
                 alt="Dashboard Icon" 
-                style="width: 120px; height: 120px; margin-left: 20px; object-fit: contain; margin-right: 20px;"
-            >
+                style="width: 120px; height: 120px; margin-left: 20px; object-fit: contain; margin-right: 20px;">
             <div style=" display: flex; flex-grow: 1; flex-direction: column; justify-content: center; line-height: 1.0; padding: 0; ">
                 <h2 class="main-title">Dashboard Kesehatan</h2>
                 <h4 class="sub-title">Provinsi Kalimantan Selatan</h4>
@@ -256,24 +282,7 @@ def main_app():
 
     # --- Sidebar (Menggunakan st.sidebar untuk interaktivitas) ---
     with st.sidebar:
-        st.markdown(
-            """
-            <h4 class="sidebar-title">Kategori</h4>
-            <ul class="sidebar-list">
-                <li class="sidebar-item">
-                    <span class="category-icon">&gt;</span>
-                    <span class="category-icon">👤</span>
-                    <span class="item-text">Tenaga Kesehatan</span>
-                </li>
-                <li class="sidebar-item">
-                    <span class="category-icon">&gt;</span>
-                    <span class="category-icon">📦</span>
-                    <span class="item-text">Kasus Penyakit</span>
-                </li>
-            </ul>
-            """, unsafe_allow_html=True
-        )
-        st.markdown('<h4 class="sidebar-title" style="padding-left:20px;">Tahun</h4>', unsafe_allow_html=True)
+        st.markdown('<h4 class="sidebar-title" style="padding-left:40px;">Tahun</h4>', unsafe_allow_html=True)
         selected_year = st.radio(
             "Pilih Tahun", 
             options=[2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017],
@@ -282,9 +291,7 @@ def main_app():
             label_visibility='collapsed'
         )
 
-
     # === LAYOUT RESPONSIF DENGAN KOLOM STREAMLIT ===
-    # Buat dua kolom utama, spacer tidak lagi diperlukan karena st.sidebar
     chart_col, right_col = st.columns([2.4, 1], gap="medium")
 
     # === Grafi Tren di kolom tengah (sekitar 50% layar) ===
@@ -875,10 +882,8 @@ def main_app():
             st.error(f"Gagal membuat scatter plot korelasi: {e}")
             st.error(traceback.format_exc())
         
-                            
-    # === DIV 2: Kab/Kota (Warna #044335) ===
-    with right_col:
-        
+    # === Kolom Kanan (sekitar 30% layar) ===                          
+    with right_col:        
         # === Card Kabupaten/Kota dengan Dropdown dan Peta ===
         try:
             # Data koordinat untuk setiap wilayah di Kalimantan Selatan
@@ -967,7 +972,7 @@ def main_app():
                     label_visibility='collapsed'
                 )
                        
-            # Ambil data untuk wilayah yang dipilih
+            # MODIFIKASI: Heat Map Beban Kerja
             id_wilayah_selected = wilayah_to_id.get(selected_wilayah, 3)
             id_tahun = year_to_id.get(selected_year, 7)
             
@@ -1000,25 +1005,123 @@ def main_app():
             total_cases_wilayah = int(df_wilayah_cases['total_cases'].iloc[0]) if not df_wilayah_cases.empty else 0
             total_workforce_wilayah = int(df_wilayah_workforce['total_workforce'].iloc[0]) if not df_wilayah_workforce.empty else 0
             
-            # Ambil koordinat wilayah yang dipilih
-            coords = koordinat_wilayah[selected_wilayah]
+            # Query data beban kerja untuk semua wilayah (untuk heatmap)
+            query_all_workload = """
+            SELECT 
+                nama_wilayah,
+                SUM(COALESCE(total_workforce, 0)) as total_workforce,
+                SUM(COALESCE(total_cases, 0)) as total_cases
+            FROM mart_workload_ratio
+            WHERE tahun = ?
+            GROUP BY nama_wilayah
+            """
+            with sqlite3.connect(MART_DB_FILE) as conn:
+                df_all_workload = pd.read_sql_query(query_all_workload, conn, params=(selected_year,))
+
+            # Buat dictionary untuk lookup data beban kerja
+            workload_data = {row['nama_wilayah']: row for _, row in df_all_workload.iterrows()}
+
+            # Tentukan pusat peta
+            if selected_wilayah == "Semua Wilayah":
+                map_center = [-2.9, 115.4]  # Pusat Kalimantan Selatan
+                map_zoom = 8
+            else:
+                coords = koordinat_wilayah[selected_wilayah]
+                map_center = [coords['lat'], coords['lon']]
+                map_zoom = coords['zoom']
             
             # Inisialisasi peta dengan zoom ke Kalimantan Selatan
             m = folium.Map(
-                location=[coords['lat'], coords['lon']],
-                zoom_start=coords['zoom'],
+                location=map_center,
+                zoom_start=map_zoom,
                 tiles='OpenStreetMap',
                 scrollWheelZoom=False,
                 dragging=True
             )
             
-            # Tambahkan marker untuk wilayah yang dipilih
-            folium.Marker(
-                location=[coords['lat'], coords['lon']],
-                popup=f"<b>{selected_wilayah}</b><br>Kasus: {total_cases_wilayah:,}<br>Tenaga: {total_workforce_wilayah:,}",
-                tooltip=selected_wilayah,
-                icon=folium.Icon(color='blue', icon='info-sign')
-            ).add_to(m)
+            # Tambahkan marker dan circle untuk setiap wilayah
+            for wilayah, coords in koordinat_wilayah.items():
+                data = workload_data.get(wilayah)
+                lat, lon = coords['lat'], coords['lon']
+                
+                if data is not None and data['total_workforce'] > 0:
+                    cases = data['total_cases']
+                    workforce = data['total_workforce']
+                    rasio_beban = cases / workforce
+
+                    # Klasifikasi status dan warna
+                    if rasio_beban <= 8:
+                        status = "RENDAH"
+                        icon_color = 'green'
+                        fill_color = '#4ade80'
+                        emoji = "🟢"
+                    elif rasio_beban <= 12:
+                        status = "SEDANG"
+                        icon_color = 'orange'
+                        fill_color = '#fbbf24'
+                        emoji = "🟡"
+                    else:
+                        status = "TINGGI"
+                        icon_color = 'red'
+                        fill_color = '#ef4444'
+                        emoji = "🔴"
+                    
+                    # Tambahkan Circle Marker (Heatmap)
+                    folium.Circle(
+                        location=[lat, lon],
+                        radius=rasio_beban * 1000, # Scaling factor
+                        color=fill_color,
+                        fill=True,
+                        fill_opacity=0.3,
+                        stroke=False
+                    ).add_to(m)
+
+                else: # Jika data tidak ada atau workforce = 0
+                    cases, workforce, rasio_beban = 0, 0, 0
+                    status = "Data Tidak Tersedia"
+                    icon_color = 'gray'
+                    emoji = "⚪"
+
+                # Buat popup
+                popup_html = f"""
+                <b>{wilayah}</b><br>
+                Kasus: {int(cases):,}<br>
+                Tenaga: {int(workforce):,}<br>
+                Rasio: {rasio_beban:.1f}:1<br>
+                Status: {emoji} {status}
+                """
+                
+                # Tambahkan Marker Ikon
+                folium.Marker(
+                    location=[lat, lon],
+                    popup=folium.Popup(popup_html, max_width=200),
+                    tooltip=wilayah,
+                    icon=folium.Icon(color=icon_color, icon='info-sign')
+                ).add_to(m)
+            
+            # Tambahkan Legenda di bawah peta
+            st.markdown(
+                """
+                <div style="background-color: black; padding: 10px; border-radius: 8px; 
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: -10px;
+                            font-family: 'Poppins', sans-serif; font-size: 0.8rem;">
+                    <h5 style="margin: 0 0 5px 0; color: #044335; text-align: center;">Legenda Beban Kerja</h5>
+                    <div style="display: flex; justify-content: space-around;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="color: #4ade80; font-size: 1.5rem;">●</span> Rendah (≤ 8:1)
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="color: #fbbf24; font-size: 1.5rem;">●</span> Sedang (8-12:1)
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="color: #ef4444; font-size: 1.5rem;">●</span> Tinggi (> 12:1)
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        
+            # Render peta
+            st_folium(m, width=None, height=300, returned_objects=[])
             
             # Tampilkan peta dalam card putih
             st.markdown(
@@ -1028,14 +1131,11 @@ def main_app():
                 """,
                 unsafe_allow_html=True
             )
-        
-            # Render peta
-            st_folium(m, width=None, height=300, returned_objects=[])
-            
+                        
             # Card informasi statistik
             st.markdown(
                 f"""
-                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -23px; margin-bottom: 15px;
+                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -2px; margin-bottom: 15px;
                             box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
                     <div style="display: flex; justify-content: space-around; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 15px;">
@@ -1076,7 +1176,7 @@ def main_app():
                 unsafe_allow_html=True
             )
          
-            # === Pie Chart Kategori (Kasus Penyakit atau Tenaga Kesehatan) ===
+            # ===  Pie Chart Kategori (Kasus Penyakit atau Tenaga Kesehatan) ===
             st.markdown(
                 """
                 <div style="position: relative; min-height: 2px;">
@@ -1347,6 +1447,144 @@ def main_app():
             st.error(f"Gagal membuat Card Metrik Beban Kerja: {e}")
             st.error(traceback.format_exc())
  
+        # === Gap Analysis Table ===
+        try:
+            # Ambil tahun dan wilayah yang dipilih
+            selected_year_gap = st.session_state.selected_year
+            selected_wilayah_gap = st.session_state.get('selected_wilayah', 'Kota Banjarmasin')
+
+            # Jangan tampilkan jika "Semua Wilayah" dipilih
+            if selected_wilayah_gap == "Semua Wilayah":
+                st.info("Pilih satu kabupaten/kota untuk melihat analisis kesenjangan.")
+            else:
+                # 1. Query total kasus untuk menghitung kebutuhan
+                query_total_cases = """
+                SELECT SUM(COALESCE(total_cases, 0)) AS total_cases
+                FROM mart_annual_case_summary
+                WHERE tahun = ? AND nama_wilayah = ?
+                """
+                with sqlite3.connect(MART_DB_FILE) as conn:
+                    df_total_cases = pd.read_sql_query(query_total_cases, conn, params=(selected_year_gap, selected_wilayah_gap))
+
+                total_cases_gap = df_total_cases['total_cases'].iloc[0] if not df_total_cases.empty else 0
+
+                if total_cases_gap == 0:
+                    st.markdown("""
+                        <div style="background-color: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px; text-align: center; font-family: 'Poppins', sans-serif; color: #044335;">
+                            Tidak ada kasus penyakit yang tercatat untuk periode ini. Analisis kesenjangan tidak dapat dilakukan.
+                        </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    # 2. Query jumlah tenaga kesehatan aktual
+                    id_tahun_gap = year_to_id.get(selected_year_gap)
+                    id_wilayah_gap = wilayah_to_id.get(selected_wilayah_gap)
+
+                    query_workforce_gap = """
+                    SELECT
+                        nama_tenaga_kerja,
+                        SUM(COALESCE(total_tenaga_kerja, 0)) AS total_aktual
+                    FROM mart_annual_workforce_summary
+                    WHERE id_tahun = ? AND id_wilayah = ?
+                    GROUP BY nama_tenaga_kerja
+                    HAVING total_aktual > 0
+                    """
+                    with sqlite3.connect(MART_DB_FILE) as conn:
+                        df_gap = pd.read_sql_query(query_workforce_gap, conn, params=(id_tahun_gap, id_wilayah_gap))
+
+                    if df_gap.empty:
+                        st.markdown("""
+                            <div style="background-color: white; border-radius: 15px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px; text-align: center; font-family: 'Poppins', sans-serif; color: #044335;">
+                                Data tenaga kesehatan tidak tersedia untuk wilayah ini.
+                            </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        # 3. Perhitungan Kebutuhan dan Gap
+                        total_workforce_aktual = df_gap['total_aktual'].sum()
+                        kebutuhan_ideal_total = total_cases_gap / 6
+                        
+                        # Distribusi kebutuhan ideal proporsional dengan komposisi tenaga kerja aktual
+                        df_gap['proporsi'] = df_gap['total_aktual'] / total_workforce_aktual if total_workforce_aktual > 0 else 0
+                        df_gap['kebutuhan_ideal'] = df_gap['proporsi'] * kebutuhan_ideal_total
+                        df_gap['gap'] = df_gap['total_aktual'] - df_gap['kebutuhan_ideal']
+
+                        # 4. Buat Tabel HTML
+                        table_rows_html = ""
+                        for _, row in df_gap.iterrows():
+                            jenis_tenaga = row['nama_tenaga_kerja'].replace('Tenaga Kesehatan - ', '').replace('Jumlah ', '')
+                            jumlah_aktual = f"{int(row['total_aktual']):,} tenaga"
+                            gap_value = int(round(row['gap']))
+
+                            if gap_value < 0:
+                                gap_color = "#ef4444" # Merah
+                                gap_text = f"{gap_value:,}"
+                            elif gap_value > 0:
+                                gap_color = "#4ade80" # Hijau
+                                gap_text = f"+{gap_value:,}"
+                            else:
+                                gap_color = "#999999" # Abu-abu
+                                gap_text = "0"
+
+                            table_rows_html += f"""
+                            <tr>
+                                <td>{jenis_tenaga}</td>
+                                <td style="text-align: right;">{jumlah_aktual}</td>
+                                <td style="text-align: right; color: {gap_color}; font-weight: bold;">{gap_text}</td>
+                            </tr>
+                            """
+
+                        # 5. Buat Footer Card
+                        total_gap = int(round(df_gap['gap'].sum()))
+                        if total_gap < 0:
+                            footer_bg = "#ef4444"
+                            footer_text = f"🔴 Kekurangan Total: {abs(total_gap):,} tenaga"
+                        else:
+                            footer_bg = "#4ade80"
+                            footer_text = f"🟢 Surplus Total: {total_gap:,} tenaga"
+
+                        # 6. Gabungkan semua menjadi satu card HTML
+                        gap_analysis_html = f"""
+                        <div style="background-color: white; border-radius: 15px; padding: 20px; 
+                                    box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 15px;
+                                    font-family: 'Poppins', sans-serif;">
+                            <h4 style="color: #044335; margin-top: 0; margin-bottom: 15px; font-weight: bold;">
+                                📋 Gap Analisis - {selected_wilayah_gap}
+                            </h4>
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color: #044335; color: white; padding: 10px; text-align: left; font-weight: bold;">Jenis Tenaga</th>
+                                            <th style="background-color: #044335; color: white; padding: 10px; text-align: right; font-weight: bold;">Aktual</th>
+                                            <th style="background-color: #044335; color: white; padding: 10px; text-align: right; font-weight: bold;">Gap</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {table_rows_html}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="background-color: {footer_bg}; color: white; text-align: center;
+                                        padding: 10px; border-radius: 0 0 10px 10px; margin: 15px -20px -20px -20px;
+                                        font-weight: bold;">
+                                {footer_text}
+                            </div>
+                        </div>
+                        """
+                        
+                        # Hitung tinggi dinamis
+                        row_height = 40
+                        header_height = 40
+                        padding_height = 40
+                        footer_height = 40
+                        dynamic_height = (len(df_gap) * row_height) + header_height + padding_height + footer_height
+                        max_height = 380 # Batas tinggi maksimum
+
+                        components.html(gap_analysis_html, height=min(dynamic_height, max_height))
+
+        except Exception as e:
+            st.error(f"Gagal membuat tabel Gap Analysis: {e}")
+            st.error(traceback.format_exc())
+
         
             st.markdown(
                 """
