@@ -100,106 +100,38 @@ st.markdown(
         height: calc(100vh - 150px);    
         background-color: #044335;    
         border-radius: 0px 20px 20px 0px;    
-        padding-top: 10px;  
+        padding-top: 0px;        
     }
     
-    .sidebar-title {
-        color: white; 
-        margin-top: 0;
-        margin-bottom: 10px;
-        font-size: 1rem;
-        font-weight: bold;
-        font-family: 'Poppins', sans-serif;
-    }
-
     /* Lebih spesifik untuk memastikan style tidak tertimpa oleh Streamlit */
     [data-testid="stSidebar"] .sidebar-title {
         color: #ffffff !important;
-    }
-
-    /* Styling untuk Ikon Kategori di dalam Li */
-    .category-icon {
-        font-size: 1.5rem; 
-        margin-right: 10px;
-        font-weight: bold;
+        font-size: 1.7rem;
     }
     
-    /* Styling Radio Button Tahun - Checkbox Style */
-    @keyframes checkIn {
-       0% { transform: translate(-50%, -50%) scale(0); }
-       50% { transform: translate(-50%, -50%) scale(1.2); }
-       100% { transform: translate(-50%, -50%) scale(1); }
+    /* Styling untuk radio button tahun di sidebar */
+    div[role="radiogroup"] {
+        padding-left: 110px !important;
     }
 
-   /* Styling untuk radio button container */
-   div[data-testid="stSidebar"] div[role="radiogroup"] {
-       padding-left: 50px !important;
-       margin-top: 10px !important;
-   }
-
-   /* Style untuk setiap radio item */
-   div[data-testid="stSidebar"] div[role="radiogroup"] label {
-       display: flex !important;
-       align-items: center !important;
-       margin-bottom: 12px !important;
-       cursor: pointer !important;
-       color: white !important;
-       font-size: 1rem !important;
-       font-family: 'Poppins', sans-serif !important;
-       transition: all 0.2s ease !important;
-   }
-
-   /* Hover effect pada label */
-   div[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-       color: #4dd0e1 !important;
-   }
-
-   /* Style radio button (checkbox visual) */
-   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] {
-       width: 22px !important;
-       height: 22px !important;
-       margin-right: 15px !important;
-       cursor: pointer !important;
-       appearance: none !important;
-       -webkit-appearance: none !important;
-       border: 2px solid white !important;
-       border-radius: 0px !important; /* Mengubah menjadi kotak tajam */
-       background-color: transparent !important;
-       position: relative !important;
-       transition: all 0.3s ease !important;
-   }
-
-   /* Radio button saat di-hover */
-   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:hover {
-       border-color: #4dd0e1 !important;
-       box-shadow: 0 0 8px rgba(77, 208, 225, 0.4) !important;
-   }
-
-   /* Radio button saat dipilih (checked) */
-   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:checked {
-       background-color: #4dd0e1 !important;
-       border-color: #4dd0e1 !important;
-   }
-
-   /* Checkmark icon saat dipilih */
-   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:checked::after {
-       content: "✓" !important;
-       position: absolute !important;
-       top: 50% !important;
-       left: 50% !important;
-       transform: translate(-50%, -50%) !important;
-       color: #044335 !important;
-       font-size: 14px !important;
-       font-weight: bold !important;
-       animation: checkIn 0.2s ease !important;
-   }
-
-   /* Hilangkan outline default */
-   div[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"]:focus {
-       outline: none !important;
-       box-shadow: 0 0 0 3px rgba(77, 208, 225, 0.3) !important;
+    /* Style each radio item's label */
+    div[role="radiogroup"] label {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        margin-bottom: 10px !important; 
     }
 
+    /* Style the radio input button itself */
+    div[role="radiogroup"] input[type="radio"] {
+        width: 50px !important;
+        height: 50px !important;
+        cursor: pointer !important;
+        accent-color: #4dd0e1 !important; 
+        margin-right: 35px !important; 
+    }
+    
     /* Buat Grafik tren */
     .trend-chart-container {
         background-color: white;
@@ -280,9 +212,15 @@ def main_app():
         unsafe_allow_html=True
     )
 
+    # Import tracking
+    from tracking_script import inject_tracking_script
+    
+    # Inject tracking script
+    st.markdown(inject_tracking_script(), unsafe_allow_html=True)
+    
     # --- Sidebar (Menggunakan st.sidebar untuk interaktivitas) ---
     with st.sidebar:
-        st.markdown('<h4 class="sidebar-title" style="padding-left:40px;">Tahun</h4>', unsafe_allow_html=True)
+        st.markdown('<h2 class="sidebar-title" style="padding-left:40px; margin-top: -60px; ">Tahun</h2>', unsafe_allow_html=True)
         selected_year = st.radio(
             "Pilih Tahun", 
             options=[2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017],

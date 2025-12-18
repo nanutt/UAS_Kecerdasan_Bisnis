@@ -5,6 +5,208 @@ import sqlite3
 import shutil
 from datetime import datetime
 
+def create_user_logs_schema(conn):
+    """
+    Membuat struktur tabel untuk User Interaction Logs (UI/UX Tracking).
+    Dipanggil setelah create_mart_db_schema().
+    """
+    cursor = conn.cursor()
+
+    print("\n[DDL] Membuat Struktur Tabel User Logs untuk UI/UX Tracking...")
+
+    # Drop existing tables jika ada
+    tables_to_drop = [
+        'fact_user_interaction',
+        'fact_session',
+        'dim_user',
+        'dim_action',
+        'dim_element',
+        'mart_user_behavior',
+        'mart_click_path',
+        'mart_element_performance',
+        'mart_usability_score',
+        'mart_funnel'
+    ]
+
+    for table in tables_to_drop:
+        cursor.execute(f"DROP TABLE IF EXISTS {table};")
+    conn.commit()
+
+    # === DIMENSI TABLES ===
+
+    # 1. Dimensi User
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS dim_user (
+            id_user INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_session_id TEXT UNIQUE NOT NULL,
+            device_type TEXT,
+            browser TEXT,
+            screen_resolution TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+
+    # 2. Dimensi Action Type
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS dim_action (
+            id_action INTEGER PRIMARY KEY AUTOINCREMENT,
+            action_name TEXT UNIQUE NOT NULL,
+            action_category TEXT
+        );
+    """)
+
+    # 3. Dimensi Element
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS dim_element (
+            id_element INTEGER PRIMARY KEY AUTOINCREMENT,
+            element_name TEXT UNIQUE NOT NULL,
+            element_type TEXT,
+            page_section TEXT
+        );
+    """)
+
+    # === FACT TABLES ===
+
+    # 4. Fact User Interaction
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS fact_user_interaction (
+            id_interaction INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user INTEGER,
+            id_action INTEGER,
+            id_element INTEGER,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            duration_ms INTEGER,
+            is_success BOOLEAN DEFAULT 1,
+            error_message TEXT,
+            page_url TEXT,
+            previous_element TEXT,
+            FOREIGN KEY (id_user) REFERENCES dim_user(id_user),
+            FOREIGN KEY (id_action) REFERENCES dim_action(id_action),
+            FOREIGN KEY (id_element) REFERENCES dim_element(id_element)
+        );
+    """)
+
+    # 5. Fact Session
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS fact_session (
+            id_session INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user INTEGER,
+            session_start TIMESTAMP,
+            session_end TIMESTAMP,
+            total_duration_sec INTEGER,
+            total_clicks INTEGER,
+            total_errors INTEGER,
+            is_bounce BOOLEAN,
+            FOREIGN KEY (id_user) REFERENCES dim_user(id_user)
+        );
+    """)
+
+    # === MART TABLES (Agregasi UI/UX) ===
+
+    # 6. Mart User Behavior
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS mart_user_behavior (
+            date DATE,
+            total_sessions INTEGER,
+            total_clicks INTEGER,
+            total_errors INTEGER,
+            bounce_rate REAL,
+            avg_session_duration_sec REAL,
+            avg_clicks_per_session REAL
+        );
+    """)
+
+    # 7. Mart Click Path
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS mart_click_path (
+            path_sequence TEXT,
+            frequency INTEGER,
+            avg_completion_time_sec REAL,
+            success_rate REAL
+        );
+    """)
+
+    # 8. Mart Element Performance
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS mart_element_performance (
+            date DATE,
+            element_name TEXT,
+            total_interactions INTEGER,
+            error_count INTEGER,
+            error_rate REAL,
+            avg_dwell_time_sec REAL
+        );
+    """)
+
+    # 9. Mart Usability Score
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS mart_usability_score (
+            date DATE,
+            task_completion_rate REAL,
+            avg_time_on_task_sec REAL,
+            error_rate REAL,
+            usability_score REAL
+        );
+    """)
+
+    # 10. Mart Funnel Analysis
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS mart_funnel (
+            date DATE,
+            step_name TEXT,
+            step_order INTEGER,
+            user_count INTEGER,
+            dropout_rate REAL
+        );
+    """)
+
+    conn.commit()
+
+    # === INSERT SEED DATA ===
+
+    print("[SEED] Mengisi data awal untuk dim_action dan dim_element...")
+
+    # Insert data awal dim_action
+    cursor.executemany("""
+        INSERT OR IGNORE INTO dim_action (action_name, action_category) VALUES (?, ?)
+    """, [
+        ('click_button', 'click'),
+        ('click_dropdown', 'click'),
+        ('select_year', 'filter'),
+        ('select_wilayah', 'filter'),
+        ('select_kategori', 'filter'),
+        ('view_chart', 'view'),
+        ('scroll', 'scroll'),
+        ('hover', 'hover'),
+        ('page_load', 'navigation'),
+        ('page_exit', 'navigation'),
+        ('widget_change', 'interaction')
+    ])
+
+    # Insert data awal dim_element
+    cursor.executemany("""
+        INSERT OR IGNORE INTO dim_element (element_name, element_type, page_section) VALUES (?, ?, ?)
+    """, [
+        ('radio_year', 'radio_button', 'sidebar'),
+        ('dropdown_wilayah', 'dropdown', 'right_panel'),
+        ('dropdown_kategori', 'dropdown', 'right_panel'),
+        ('chart_trend', 'chart', 'main_chart'),
+        ('chart_donut', 'chart', 'main_chart'),
+        ('chart_stacked_bar_cases', 'chart', 'main_chart'),
+        ('chart_stacked_bar_workforce', 'chart', 'main_chart'),
+        ('chart_scatter_correlation', 'chart', 'main_chart'),
+        ('chart_pie_kategori', 'chart', 'right_panel'),
+        ('map_wilayah', 'map', 'right_panel'),
+        ('card_summary', 'card', 'main_chart'),
+        ('card_workload', 'card', 'right_panel'),
+        ('table_gap_analysis', 'table', 'right_panel'),
+        ('dashboard_main', 'page', 'main')
+    ])
+
+    conn.commit()
+    print("[DDL] Struktur tabel User Logs dan Mart UI/UX berhasil dibuat.")
+
+
 # --- KONFIGURASI JALUR DATA DAN DB ---
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_ROOT = PROJECT_ROOT / "Data"
@@ -237,6 +439,7 @@ def main_create_mart():
         # Kita menggunakan sqlite3.connect untuk DDL karena lebih langsung
         with sqlite3.connect(MART_DB_FILE) as conn:
             create_mart_db_schema(conn)
+            create_user_logs_schema(conn)  # TAMBAHKAN INI
 
         # D. Load Tabel-tabel Mart (Agregasi)
         load_mart_annual_case_summary(CORE_DW_ENGINE, MART_ENGINE)
