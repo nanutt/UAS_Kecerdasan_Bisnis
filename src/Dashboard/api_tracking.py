@@ -10,9 +10,22 @@ CORS(app)  # Enable CORS untuk terima request dari Streamlit
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 MART_DB_FILE = PROJECT_ROOT / "Data" / "04_data_mart" / "mart_health_summary.db"
 
-@app.route('/api/track', methods=['POST'])
+@app.route('/')
+def index():
+    """Root endpoint untuk memberikan pesan selamat datang dan status."""
+    return jsonify({
+        'status': 'running',
+        'message': 'Welcome to the User Tracking API. Please use the designated endpoints.',
+        'endpoints': ['/api/track', '/api/session', '/api/health'],
+        'timestamp': datetime.now().isoformat()
+    })
+
+@app.route('/api/track', methods=['GET','POST'])
 def track_event():
     """Endpoint untuk tracking user interaction"""
+    if request.method == 'GET':
+        return jsonify({'status': 'ready', 'message': 'Use POST to send tracking data'}), 200
+
     try:
         data = request.json
         # Validasi input dasar
@@ -113,7 +126,6 @@ def save_session():
         print(f"❌ Error saving session: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -123,44 +135,4 @@ def health_check():
 if __name__ == '__main__':
     print("🚀 Starting Flask API for User Tracking...")
     print(f"📁 Database: {MART_DB_FILE}")
-    app.run(host='0.0.0.0', port=5000, debug=True)ors'], data['is_bounce']))
-                
-                return jsonify({'status': 'success'}), 200
-            else:
-                return jsonify({'status': 'error', 'message': 'User not found'}), 404
-    
-    except Exception as e:
-        print(f"❌ Error saving session: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()}), 200
-
-
-if __name__ == '__main__':
-    print("🚀 Starting Flask API for User Tracking...")
-    print(f"📁 Database: {MART_DB_FILE}")
-    app.run(host='0.0.0.0', port=5000, debug=True)ors'], data['is_bounce']))
-                
-                return jsonify({'status': 'success'}), 200
-            else:
-                return jsonify({'status': 'error', 'message': 'User not found'}), 404
-    
-    except Exception as e:
-        print(f"❌ Error saving session: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()}), 200
-
-
-if __name__ == '__main__':
-    print("🚀 Starting Flask API for User Tracking...")
-    print(f"📁 Database: {MART_DB_FILE}")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

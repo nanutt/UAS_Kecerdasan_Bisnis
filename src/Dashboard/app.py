@@ -180,6 +180,33 @@ print(f"Path Data Mart yang dihasilkan: {MART_DB_FILE.resolve()}")
  
 # --- FUNGSI UTAMA DASHBOARD ---
 def main_app():
+    # Import tracking
+    from tracking_script import inject_tracking_script
+    import streamlit.components.v1 as components  # Sudah ada di import atas, tapi pastikan
+    
+    # Inject tracking script - GUNAKAN components.html
+    tracking_html = inject_tracking_script()
+    components.html(tracking_html, height=0)  # GANTI dari st.markdown
+    
+    # TEST TRACKING - TAMBAHKAN INI
+    st.markdown("### Test Tracking")
+    if st.button("🔴 KLIK INI UNTUK TEST TRACKING"):
+        st.success("Button diklik! Cek terminal Flask API.")
+        
+    # --- Sidebar (Pindah ke sini untuk kontrol terpusat) ---
+    with st.sidebar:
+        st.markdown('<div style="margin-top: -10px;"></div>', unsafe_allow_html=True) # Spacer
+        page = st.radio(
+            "Pilih Dashboard",
+            ("Dashboard Kesehatan", "UI/UX Analytics"),
+            label_visibility="collapsed"
+        )
+
+    if page == "UI/UX Analytics":
+        render_uiux_dashboard()
+        return # Hentikan eksekusi agar tidak melanjutkan ke kode dashboard kesehatan
+
+    # === KODE UNTUK DASHBOARD KESEHATAN ===
     # Mapping id_tahun ke tahun (definisikan di awal fungsi main_app)
     year_to_id = {
         2017: 1, 2018: 2, 2019: 3, 2020: 4,
@@ -211,16 +238,10 @@ def main_app():
         """,
         unsafe_allow_html=True
     )
-
-    # Import tracking
-    from tracking_script import inject_tracking_script
-    
-    # Inject tracking script
-    st.markdown(inject_tracking_script(), unsafe_allow_html=True)
-    
+        
     # --- Sidebar (Menggunakan st.sidebar untuk interaktivitas) ---
     with st.sidebar:
-        st.markdown('<h2 class="sidebar-title" style="padding-left:40px; margin-top: -60px; ">Tahun</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 class="sidebar-title" style="padding-left:20px; margin-top: -20px; ">Tahun</h2>', unsafe_allow_html=True)
         selected_year = st.radio(
             "Pilih Tahun", 
             options=[2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017],
@@ -1533,6 +1554,632 @@ def main_app():
                 unsafe_allow_html=True
             )
 
+# --- FUNGSI UNTUK DASHBOARD UI/UX ---
+
+def render_user_behavior_metrics():
+    """Render user behavior metrics"""
+    try:
+        query = """
+        SELECT
+            date,
+            total_sessions,
+            total_clicks,
+            bounce_rate,
+            avg_session_duration_sec,
+            avg_clicks_per_session
+        FROM mart_user_behavior
+        ORDER BY date DESC
+        LIMIT 30
+        """
+
+        with sqlite3.connect(MART_DB_FILE) as conn:
+            df = pd.read_sql_query(query, conn)
+
+        if df.empty:
+            st.markdown("""
+            <div style="background-color: #044335; color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: 'Poppins', sans-serif;">
+                <h4>📊 Belum ada data user behavior</h4>
+                <p>Silakan gunakan dashboard utama untuk mulai tracking aktivitas pengguna.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
+
+        # Display raw data for debugging
+        st.write("### Debug: Raw Data from mart_user_behavior")
+        st.dataframe(df)
+
+        # Metrics cards
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("Total Sessions", f"{df['total_sessions'].iloc[0]:,}")
+        with col2:
+            st.metric("Bounce Rate", f"{df['bounce_rate'].iloc[0]:.1f}%")
+        with col3:
+            st.metric("Avg Duration", f"{df['avg_session_duration_sec'].iloc[0]:.0f}s")
+        with col4:
+            st.metric("Avg Clicks", f"{df['avg_clicks_per_session'].iloc[0]:.1f}")
+
+        # Trend charts
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df['date'],
+            y=df['total_sessions'],
+            name='Sessions',
+            line=dict(color='#4dd0e1')
+        ))
+        fig.add_trace(go.Scatter(
+            x=df['date'],
+            y=df['bounce_rate'],
+            name='Bounce Rate (%)',
+            line=dict(color='#ef4444'),
+            yaxis='y2'
+        ))
+
+        fig.update_layout(
+            title='User Behavior Trend (Last 30 Days)',
+            yaxis=dict(title='Sessions'),
+            yaxis2=dict(title='Bounce Rate (%)', overlaying='y', side='right'),
+            height=400,
+            plot_bgcolor='rgba(255,255,255,0.9)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="black"),
+            legend=dict(bgcolor='rgba(255,255,255,0.8)')
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    except Exception as e:
+        st.error(f"Error loading user behavior metrics: {e}")
+        st.warning("Pastikan tabel 'mart_user_behavior' ada di database dan berisi data.")
+        import traceback
+        st.code(traceback.format_exc())
+
+def render_click_path_analysis():
+    """Render Click Path Analysis dengan data dari mart_click_path"""
+    try:
+        # Query data click path
+        query = """
+        SELECT
+            path_sequence,
+            frequency,
+            avg_completion_time_sec,
+            success_rate
+        FROM mart_click_path
+        ORDER BY frequency DESC
+        LIMIT 20
+        """
+
+        with sqlite3.connect(MART_DB_FILE) as conn:
+            df_paths = pd.read_sql_query(query, conn)
+
+        if df_paths.empty:
+            st.markdown("""
+            <div style="background-color: #044335; color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: 'Poppins', sans-serif;">
+                <h4>🔍 Belum ada data Click Path</h4>
+                <p>Data akan muncul setelah pengguna berinteraksi dengan dashboard.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
+
+        # Header
+        st.markdown("""
+        <div style="background-color: #044335; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-family: 'Poppins', sans-serif;">
+            <h4 style="margin: 0;">🔍 Analisis Jalur Klik Pengguna</h4>
+            <p style="margin: 5px 0 0 0; font-size: 0.9em;">Urutan klik yang paling sering dilakukan pengguna</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Metrics cards
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            total_paths = len(df_paths)
+            st.metric("Total Jalur Unik", f"{total_paths:,}")
+        with col2:
+            avg_freq = df_paths['frequency'].mean()
+            st.metric("Rata-rata Frekuensi", f"{avg_freq:.1f}")
+        with col3:
+            max_freq = df_paths['frequency'].max()
+            st.metric("Frekuensi Tertinggi", f"{max_freq:,}")
+
+        # Bar chart untuk top paths
+        fig = go.Figure()
+
+        # Ambil top 10 untuk chart
+        top_paths = df_paths.head(10).copy()
+        top_paths['short_path'] = top_paths['path_sequence'].apply(lambda x: x[:50] + '...' if len(x) > 50 else x)
+
+        fig.add_trace(go.Bar(
+            x=top_paths['frequency'],
+            y=top_paths['short_path'],
+            orientation='h',
+            marker_color='#4dd0e1',
+            hovertemplate='<b>%{y}</b><br>Frekuensi: %{x}<extra></extra>'
+        ))
+
+        fig.update_layout(
+            title='Top 10 Jalur Klik Terpopuler',
+            xaxis_title='Frekuensi',
+            yaxis_title='Jalur Klik',
+            height=400,
+            plot_bgcolor='rgba(255,255,255,0.9)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="black", family='Poppins'),
+            margin=dict(l=200, r=20, t=50, b=20)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Tabel detail
+        st.markdown('<h5 style="color: #044335; font-family: Poppins;">Detail Jalur Klik</h5>', unsafe_allow_html=True)
+
+        # Format data untuk tabel
+        df_display = df_paths.copy()
+        df_display['path_sequence'] = df_display['path_sequence'].apply(lambda x: x.replace(' → ', ' →<br>'))
+        df_display['avg_completion_time_sec'] = df_display['avg_completion_time_sec'].round(1)
+        df_display['success_rate'] = df_display['success_rate'].round(1)
+
+        # Rename columns
+        df_display.columns = ['Jalur Klik', 'Frekuensi', 'Waktu Selesai (detik)', 'Tingkat Keberhasilan (%)']
+
+        # Display sebagai table dengan HTML
+        table_html = f"""
+        <div style="background-color: white; border-radius: 15px; padding: 20px; 
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 10px;
+                    font-family: 'Poppins', sans-serif; max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #044335; color: white;">
+                        <th style="padding: 12px; text-align: left; font-weight: bold;">Jalur Klik</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Frekuensi</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Waktu Selesai</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Keberhasilan</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+
+        for _, row in df_display.iterrows():
+            table_html += f"""
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px; text-align: left; font-size: 0.9em;">{row['Jalur Klik']}</td>
+                        <td style="padding: 10px; text-align: center; font-weight: bold; color: #044335;">{row['Frekuensi']:,}</td>
+                        <td style="padding: 10px; text-align: center;">{row['Waktu Selesai (detik)']}s</td>
+                        <td style="padding: 10px; text-align: center;">{row['Tingkat Keberhasilan (%)']}%</td>
+                    </tr>
+            """
+
+        table_html += """
+                </tbody>
+            </table>
+        </div>
+        """
+
+        components.html(table_html, height=450, scrolling=True)
+
+    except Exception as e:
+        st.error(f"Error loading click path analysis: {e}")
+        st.warning("Pastikan tabel 'mart_click_path' ada di database dan berisi data.")
+        import traceback
+        st.code(traceback.format_exc())
+
+def render_error_analysis():
+    """Render Error Analysis dengan data dari mart_element_performance"""
+    try:
+        # Query data error analysis
+        query = """
+        SELECT
+            element_name,
+            total_interactions,
+            error_count,
+            error_rate,
+            avg_dwell_time_sec
+        FROM mart_element_performance
+        ORDER BY error_rate DESC, total_interactions DESC
+        LIMIT 20
+        """
+
+        with sqlite3.connect(MART_DB_FILE) as conn:
+            df_errors = pd.read_sql_query(query, conn)
+
+        if df_errors.empty:
+            st.markdown("""
+            <div style="background-color: #044335; color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: 'Poppins', sans-serif;">
+                <h4>⚠️ Belum ada data Error Analysis</h4>
+                <p>Data akan muncul setelah pengguna berinteraksi dengan dashboard.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
+
+        # Header
+        st.markdown("""
+        <div style="background-color: #044335; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-family: 'Poppins', sans-serif;">
+            <h4 style="margin: 0;">⚠️ Analisis Error & Performa Elemen</h4>
+            <p style="margin: 5px 0 0 0; font-size: 0.9em;">Tingkat error dan performa setiap elemen UI</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Metrics cards
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            total_elements = len(df_errors)
+            st.metric("Total Elemen", f"{total_elements:,}")
+        with col2:
+            avg_error_rate = df_errors['error_rate'].mean()
+            st.metric("Rata-rata Error", f"{avg_error_rate:.1f}%")
+        with col3:
+            max_error_rate = df_errors['error_rate'].max()
+            st.metric("Error Tertinggi", f"{max_error_rate:.1f}%")
+        with col4:
+            avg_dwell = df_errors['avg_dwell_time_sec'].mean()
+            st.metric("Rata-rata Dwell Time", f"{avg_dwell:.1f}s")
+
+        # Bar chart untuk error rates
+        fig = go.Figure()
+
+        # Ambil top 10 error-prone elements
+        top_errors = df_errors.head(10).copy()
+
+        fig.add_trace(go.Bar(
+            x=top_errors['error_rate'],
+            y=top_errors['element_name'],
+            orientation='h',
+            marker_color='#ef4444',
+            hovertemplate='<b>%{y}</b><br>Error Rate: %{x:.1f}%<extra></extra>'
+        ))
+
+        fig.update_layout(
+            title='Top 10 Elemen dengan Error Tertinggi',
+            xaxis_title='Error Rate (%)',
+            yaxis_title='Elemen UI',
+            height=400,
+            plot_bgcolor='rgba(255,255,255,0.9)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="black", family='Poppins'),
+            margin=dict(l=200, r=20, t=50, b=20)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Scatter plot: Error Rate vs Dwell Time
+        fig_scatter = go.Figure()
+
+        fig_scatter.add_trace(go.Scatter(
+            x=df_errors['avg_dwell_time_sec'],
+            y=df_errors['error_rate'],
+            mode='markers+text',
+            text=df_errors['element_name'],
+            textposition="top center",
+            marker=dict(
+                size=df_errors['total_interactions']/df_errors['total_interactions'].max()*20 + 10,
+                color='#4dd0e1',
+                sizemode='diameter'
+            ),
+            hovertemplate='<b>%{text}</b><br>Dwell Time: %{x:.1f}s<br>Error Rate: %{y:.1f}%<extra></extra>'
+        ))
+
+        fig_scatter.update_layout(
+            title='Korelasi Error Rate vs Dwell Time',
+            xaxis_title='Average Dwell Time (seconds)',
+            yaxis_title='Error Rate (%)',
+            height=400,
+            plot_bgcolor='rgba(255,255,255,0.9)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="black", family='Poppins'),
+            showlegend=False
+        )
+
+        st.plotly_chart(fig_scatter, use_container_width=True)
+
+        # Tabel detail
+        st.markdown('<h5 style="color: #044335; font-family: Poppins;">Detail Performa Elemen</h5>', unsafe_allow_html=True)
+
+        # Format data untuk tabel
+        df_display = df_errors.copy()
+        df_display['total_interactions'] = df_display['total_interactions'].apply(lambda x: f"{x:,}")
+        df_display['error_count'] = df_display['error_count'].apply(lambda x: f"{x:,}")
+        df_display['error_rate'] = df_display['error_rate'].apply(lambda x: f"{x:.1f}%")
+        df_display['avg_dwell_time_sec'] = df_display['avg_dwell_time_sec'].apply(lambda x: f"{x:.1f}s")
+
+        # Rename columns
+        df_display.columns = ['Elemen UI', 'Total Interaksi', 'Jumlah Error', 'Tingkat Error', 'Rata-rata Dwell Time']
+
+        # Display sebagai table dengan HTML
+        table_html = f"""
+        <div style="background-color: white; border-radius: 15px; padding: 20px;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 10px;
+                    font-family: 'Poppins', sans-serif; max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #044335; color: white;">
+                        <th style="padding: 12px; text-align: left; font-weight: bold;">Elemen UI</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Total Interaksi</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Jumlah Error</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Tingkat Error</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Dwell Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+
+        for _, row in df_display.iterrows():
+            table_html += f"""
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px; text-align: left; font-size: 0.9em;">{row['Elemen UI']}</td>
+                        <td style="padding: 10px; text-align: center;">{row['Total Interaksi']}</td>
+                        <td style="padding: 10px; text-align: center; color: #ef4444; font-weight: bold;">{row['Jumlah Error']}</td>
+                        <td style="padding: 10px; text-align: center; color: #ef4444;">{row['Tingkat Error']}</td>
+                        <td style="padding: 10px; text-align: center;">{row['Rata-rata Dwell Time']}</td>
+                    </tr>
+            """
+
+        table_html += """
+                </tbody>
+            </table>
+        </div>
+        """
+
+        components.html(table_html, height=450, scrolling=True)
+
+    except Exception as e:
+        st.error(f"Error loading error analysis: {e}")
+        st.warning("Pastikan tabel 'mart_element_performance' ada di database dan berisi data.")
+        import traceback
+        st.code(traceback.format_exc())
+
+def render_funnel_analysis():
+    """Render Funnel Analysis dengan data dari mart_funnel"""
+    try:
+        query = """
+        SELECT step_name, step_order, user_count, dropout_rate
+        FROM mart_funnel
+        WHERE date = DATE('now')
+        ORDER BY step_order
+        """
+
+        with sqlite3.connect(MART_DB_FILE) as conn:
+            df = pd.read_sql_query(query, conn)
+
+        if df.empty:
+            st.markdown("""
+            <div style="background-color: #044335; color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: 'Poppins', sans-serif;">
+                <h4>🎯 Belum ada data Funnel Analysis</h4>
+                <p>Data akan muncul setelah pengguna berinteraksi dengan dashboard.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
+
+        # Header
+        st.markdown("""
+        <div style="background-color: #044335; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-family: 'Poppins', sans-serif;">
+            <h4 style="margin: 0;">🎯 Analisis Funnel Pengguna</h4>
+            <p style="margin: 5px 0 0 0; font-size: 0.9em;">Alur langkah-langkah pengguna dalam dashboard</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Metrics
+        total_users = df['user_count'].max()
+        completion_rate = (df['user_count'].iloc[-1] / df['user_count'].iloc[0] * 100) if df['user_count'].iloc[0] > 0 else 0
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Users", f"{total_users:,}")
+        with col2:
+            st.metric("Completion Rate", f"{completion_rate:.1f}%")
+        with col3:
+            avg_dropout = df['dropout_rate'].mean()
+            st.metric("Avg Dropout Rate", f"{avg_dropout:.1f}%")
+
+        # Funnel chart
+        fig = go.Figure(go.Funnel(
+            y = df['step_name'],
+            x = df['user_count'],
+            textinfo = "value+percent initial",
+            marker = {"color": ["#4dd0e1", "#7e57c2", "#e57373", "#64b5f6", "#ffb74d"]}
+        ))
+
+        fig.update_layout(
+            title='User Funnel',
+            height=400,
+            plot_bgcolor='rgba(255,255,255,0.9)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color="black", family='Poppins')
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Table
+        st.markdown('<h5 style="color: #044335; font-family: Poppins;">Detail Funnel Steps</h5>', unsafe_allow_html=True)
+
+        df_display = df.copy()
+        df_display['user_count'] = df_display['user_count'].apply(lambda x: f"{x:,}")
+        df_display['dropout_rate'] = df_display['dropout_rate'].apply(lambda x: f"{x:.1f}%")
+        df_display.columns = ['Step Name', 'Order', 'User Count', 'Dropout Rate']
+
+        table_html = f"""
+        <div style="background-color: white; border-radius: 15px; padding: 20px;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 10px;
+                    font-family: 'Poppins', sans-serif; max-height: 300px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #044335; color: white;">
+                        <th style="padding: 12px; text-align: left; font-weight: bold;">Step</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Users</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold;">Dropout Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+
+        for _, row in df_display.iterrows():
+            table_html += f"""
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px; text-align: left;">{row['Step Name']}</td>
+                        <td style="padding: 10px; text-align: center; font-weight: bold;">{row['User Count']}</td>
+                        <td style="padding: 10px; text-align: center; color: #ef4444;">{row['Dropout Rate']}</td>
+                    </tr>
+            """
+
+        table_html += """
+                </tbody>
+            </table>
+        </div>
+        """
+
+        components.html(table_html, height=350, scrolling=True)
+
+    except Exception as e:
+        st.error(f"Error loading funnel analysis: {e}")
+        st.warning("Pastikan tabel 'mart_funnel' ada di database dan berisi data.")
+        import traceback
+        st.code(traceback.format_exc())
+
+def render_usability_score():
+    """Render Usability Score dengan data dari mart_usability_score"""
+    try:
+        # Query data usability score terbaru
+        query = """
+        SELECT
+            date,
+            task_completion_rate,
+            avg_time_on_task_sec,
+            error_rate,
+            usability_score
+        FROM mart_usability_score
+        ORDER BY date DESC
+        LIMIT 1
+        """
+
+        with sqlite3.connect(MART_DB_FILE) as conn:
+            df = pd.read_sql_query(query, conn)
+
+        if df.empty:
+            st.markdown("""
+            <div style="background-color: #044335; color: white; padding: 20px; border-radius: 10px; text-align: center; font-family: 'Poppins', sans-serif;">
+                <h4>📊 Belum ada data Usability Score</h4>
+                <p>Data akan muncul setelah pengguna berinteraksi dengan dashboard.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
+
+        # Ambil data terbaru
+        latest = df.iloc[0]
+        score = latest['usability_score']
+        completion = latest['task_completion_rate']
+        time_on_task = latest['avg_time_on_task_sec']
+        error_rate = latest['error_rate']
+        date = latest['date']
+
+        # Header
+        st.markdown("""
+        <div style="background-color: #044335; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-family: 'Poppins', sans-serif;">
+            <h4 style="margin: 0;">⭐ Usability Score Dashboard</h4>
+            <p style="margin: 5px 0 0 0; font-size: 0.9em;">Skor kegunaan sistem berdasarkan interaksi pengguna</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Main Score Card
+        score_color = "#4ade80" if score >= 80 else "#fbbf24" if score >= 60 else "#ef4444"
+        score_emoji = "🟢" if score >= 80 else "🟡" if score >= 60 else "🔴"
+
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #00776b 0%, #044335 100%);
+                    border-radius: 15px; padding: 30px; margin-bottom: 20px;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center;
+                    font-family: 'Poppins', sans-serif;">
+            <div style="font-size: 4rem; margin-bottom: 10px;">{score_emoji}</div>
+            <div style="color: #ffb74d; font-size: 3rem; font-weight: bold;">{score:.1f}</div>
+            <div style="color: white; font-size: 1.2rem;">Usability Score</div>
+            <div style="color: #ffb74d; font-size: 0.9rem; margin-top: 5px;">Data per {date}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Metrics Cards
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.markdown(f"""
+            <div style="background-color: white; border-radius: 15px; padding: 20px;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center;
+                        font-family: 'Poppins', sans-serif;">
+                <div style="color: #044335; font-size: 2rem; font-weight: bold;">{completion:.1f}%</div>
+                <div style="color: #666; font-size: 0.9rem;">Task Completion Rate</div>
+                <div style="color: #044335; font-size: 0.8rem; margin-top: 5px;">Tingkat penyelesaian tugas</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col2:
+            st.markdown(f"""
+            <div style="background-color: white; border-radius: 15px; padding: 20px;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center;
+                        font-family: 'Poppins', sans-serif;">
+                <div style="color: #044335; font-size: 2rem; font-weight: bold;">{time_on_task:.1f}s</div>
+                <div style="color: #666; font-size: 0.9rem;">Avg Time on Task</div>
+                <div style="color: #044335; font-size: 0.8rem; margin-top: 5px;">Rata-rata waktu penyelesaian</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col3:
+            st.markdown(f"""
+            <div style="background-color: white; border-radius: 15px; padding: 20px;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center;
+                        font-family: 'Poppins', sans-serif;">
+                <div style="color: #044335; font-size: 2rem; font-weight: bold;">{error_rate:.1f}%</div>
+                <div style="color: #666; font-size: 0.9rem;">Error Rate</div>
+                <div style="color: #044335; font-size: 0.8rem; margin-top: 5px;">Tingkat kesalahan pengguna</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Formula Explanation
+        st.markdown("""
+        <div style="background-color: white; border-radius: 15px; padding: 20px;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-top: 20px;
+                    font-family: 'Poppins', sans-serif;">
+            <h5 style="color: #044335; margin-top: 0;">📐 Formula Perhitungan</h5>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 10px;">
+                <div style="font-family: monospace; color: #044335; line-height: 1.6;">
+                    Usability Score = (Completion Rate × 0.5) + (Time Efficiency × 0.3) + ((100 - Error Rate) × 0.2)<br><br>
+                    <strong>Dimana:</strong><br>
+                    • Completion Rate = Tingkat penyelesaian tugas (0-100%)<br>
+                    • Time Efficiency = Efisiensi waktu (100% jika ≤30s, turun linear sampai 0% di 120s)<br>
+                    • Error Rate = Tingkat kesalahan (0-100%)
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    except Exception as e:
+        st.error(f"Error loading usability score: {e}")
+        st.warning("Pastikan tabel 'mart_usability_score' ada di database dan berisi data.")
+        import traceback
+        st.code(traceback.format_exc())
+
+def render_uiux_dashboard():
+    """Render dashboard UI/UX metrics"""
+    st.markdown('<h2 style="color: white;">📊 UI/UX Performance Dashboard</h2>', unsafe_allow_html=True)
+    
+    # Tab selector
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "📈 User Behavior", 
+        "🔍 Click Path", 
+        "⚠️ Error Analysis", 
+        "🎯 Funnel", 
+        "⭐ Usability Score"
+    ])
+    
+    with tab1:
+        render_user_behavior_metrics()
+    with tab2:
+        render_click_path_analysis()
+    with tab3:
+        render_error_analysis()
+    with tab4:
+        render_funnel_analysis()
+    with tab5:
+        render_usability_score()
+
 # --- JALANKAN APLIKASI ---
 if __name__ == "__main__":
+    # Cukup panggil fungsi main_app yang sekarang sudah mengontrol navigasi  
+    
     main_app()
