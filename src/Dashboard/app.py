@@ -187,11 +187,6 @@ def main_app():
     # Inject tracking script - GUNAKAN components.html
     tracking_html = inject_tracking_script()
     components.html(tracking_html, height=0)  # GANTI dari st.markdown
-    
-    # TEST TRACKING - TAMBAHKAN INI
-    st.markdown("### Test Tracking")
-    if st.button("🔴 KLIK INI UNTUK TEST TRACKING"):
-        st.success("Button diklik! Cek terminal Flask API.")
         
     # --- Sidebar (Pindah ke sini untuk kontrol terpusat) ---
     with st.sidebar:
