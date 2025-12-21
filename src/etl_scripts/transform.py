@@ -15,7 +15,7 @@ DATA_ROOT = PROJECT_ROOT / "Data"
 RAW_DATA_PATH = DATA_ROOT / "01_raw"          # Sumber: File JSON mentah
 STAGING_PATH = DATA_ROOT / "02_staging"      # Tujuan: Staging Area (STG_DB/INT_DB)
 CORE_DW_PATH = DATA_ROOT / "05_core_dw"      # Core DW Area
-BACKUP_PATH = DATA_ROOT / "06_backup"        # Folder untuk backup
+BACKUP_PATH = DATA_ROOT / "06_backup" / "backup_daily"        # Folder untuk backup
 
 # 3. DATABASE FILES
 CORE_DW_DB_FILE = CORE_DW_PATH / "core_dw_mart.db" # Database Core DW
@@ -200,9 +200,9 @@ def create_timestamped_backup():
 
             try:
                 shutil.copy2(original_path, backup_db_path)
-                print(f"✅ Backup DB {original_path.name} berhasil disimpan.")
+                print(f"[SUCCESS] Backup DB {original_path.name} berhasil disimpan.")
             except Exception as e:
-                print(f"⚠️ Peringatan: Gagal backup {original_path.name}: {e}")
+                print(f"[WARNING] Gagal backup {original_path.name}: {e}")
         else:
             print(f"ℹ️ File {original_path.name} tidak ditemukan, melewati backup.")
 
