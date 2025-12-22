@@ -10,6 +10,7 @@ import streamlit.components.v1 as components
 import plotly.graph_objects as go
 import folium
 from streamlit_folium import st_folium
+import datetime
 
 # --- KONFIGURASI TEMA DAN LAYOUT ---
 st.set_page_config(
@@ -2166,9 +2167,11 @@ def render_uiux_dashboard():
     # --- PERUBAHAN: JALANKAN ETL SECARA OTOMATIS ---
     # Menjalankan proses ETL setiap kali halaman UI/UX dibuka untuk memastikan data selalu terbaru.
     if etl_uiux_metrics:
-        with st.spinner("Memuat dan mengagregasi data interaksi pengguna terbaru..."):
+        with st.spinner("Mengupdate Data Mart: User Behavior, Click Path, Element Performance, Funnel, Usability Score..."):
             try:
                 etl_uiux_metrics.main_etl_uiux()
+                current_time = datetime.datetime.now().strftime("%H:%M:%S")
+                st.toast(f"Semua metrik UI/UX berhasil diperbarui pada {current_time}", icon="✅")
                 # Tidak perlu st.rerun() karena script akan lanjut dan membaca data yang baru di-update.
             except Exception as e:
                 st.error(f"Gagal menjalankan ETL untuk update data UI/UX: {e}")
