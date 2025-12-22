@@ -47,10 +47,6 @@ goto :END
 :SUCCESS
 echo [%DATE% %TIME%] [STATUS] Proses ETL Selesai dan SUKSES. >> %LOG_FILE%
 
-REM --- TAHAP 4: ORGANISASI BACKUP (Opsional) ---
-echo [%DATE% %TIME%] [STAGE 4/4] Memindahkan file backup ke backup_daily... >> %LOG_FILE%
-powershell -Command "foreach ($f in Get-ChildItem Data\06_backup\*backup*.db) { Move-Item $f Data\06_backup\backup_daily\ }" >> %LOG_FILE% 2>&1
-
 :END
 call deactivate
 echo [%DATE% %TIME%] Deaktivasi VENV. >> %LOG_FILE%
