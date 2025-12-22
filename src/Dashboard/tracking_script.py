@@ -14,6 +14,9 @@ def inject_tracking_script():
     let errorCount = 0;
     let lastElement = null;
     
+    // KONFIGURASI API: Gunakan hostname saat ini agar bisa diakses dari device lain
+    const API_BASE_URL = "http://" + window.location.hostname + ":5000";
+
     // Track page load
     window.addEventListener('load', function() {
         trackEvent('page_load', 'page', 'dashboard_main', true);
@@ -62,7 +65,7 @@ def inject_tracking_script():
         
         console.log('📤 Sending tracking data:', actionName, elementName);
         
-        fetch('http://localhost:5000/api/track', {
+        fetch(API_BASE_URL + '/api/track', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(eventData)
@@ -90,7 +93,7 @@ def inject_tracking_script():
             is_bounce: isBounce ? 1 : 0
         };
         
-        fetch('http://localhost:5000/api/session', {
+        fetch(API_BASE_URL + '/api/session', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(sessionData),

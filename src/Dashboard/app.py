@@ -1,4 +1,5 @@
 import streamlit as st
+import sys
 import pandas as pd
 from pathlib import Path
 import sqlite3
@@ -169,6 +170,15 @@ st.markdown(
 # --- KONFIGURASI JALUR DATA DAN DB ---
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_ROOT = PROJECT_ROOT / "Data"
+
+# Tambahkan root project ke sys.path agar bisa import modul ETL
+sys.path.append(str(PROJECT_ROOT))
+
+# Import modul ETL untuk update data UI/UX secara real-time
+try:
+    from src.etl_scripts import etl_uiux_metrics
+except ImportError:
+    etl_uiux_metrics = None
 
 # Sumber: Data Mart
 MART_PATH = DATA_ROOT / "04_data_mart"
@@ -2152,6 +2162,26 @@ def render_usability_score():
 def render_uiux_dashboard():
     """Render dashboard UI/UX metrics"""
     st.markdown('<h2 style="color: white;">📊 UI/UX Performance Dashboard</h2>', unsafe_allow_html=True)
+    
+    # Tombol untuk memicu ETL (Agregasi Data) secara manual
+    # Penting: Dashboard membaca tabel Mart, sedangkan API menulis ke tabel Fact.
+    # Tombol ini menjembatani keduanya.
+    col_btn, col_info = st.columns([1, 3])
+    with col_btn:
+        if st.button("🔄 Update Data (Run ETL)"):
+            if etl_uiux_metrics:
+                with st.spinner("Sedang mengagregasi data interaksi user..."):
+                    try:
+                        etl_uiux_metrics.main_etl_uiux()
+                        st.success("Data berhasil diperbarui! Halaman akan dimuat ulang.")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Gagal update data: {e}")
+            else:
+                st.error("Modul ETL tidak ditemukan. Pastikan struktur folder benar.")
+    
+    with col_info:
+        st.info("Klik tombol ini setelah melakukan simulasi user untuk melihat hasil analisis terbaru.")
     
     # Tab selector
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
