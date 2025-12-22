@@ -863,7 +863,7 @@ def main_app():
             col1, col2 = st.columns([2, 1.3])
             with col1:
                 st.markdown("""
-                        <div style="background-color: #044335; border-radius: 15px 15px 0 0; padding: 20px 25px 15px 25px; margin-right: -199px; margin-bottom: -20px;">
+                        <div style="background-color: #044335; border-radius: 15px 15px 0 0; padding: 20px 25px 15px 25px; margin-right: -179px; margin-bottom: -20px;">
                             <h4 style="color: white; font-family: Poppins; margin: 0; padding: 0;">Kabupaten/Kota</h4>
                         </div>
                     """, unsafe_allow_html=True
@@ -1080,7 +1080,7 @@ def main_app():
             # Tampilkan peta dalam card putih
             st.markdown(
                 """
-                <div style="background-color: white; padding: 15px; margin-top: -10px; 
+                <div style="background-color: white; padding: 15px; margin-top: -35px; 
                             box-shadow: 0 8px 20px rgba(0,0,0,0.12); ">
                 """,
                 unsafe_allow_html=True
@@ -1089,7 +1089,7 @@ def main_app():
             # Card informasi statistik
             st.markdown(
                 f"""
-                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -2px; margin-bottom: 15px;
+                <div style="background-color: #044335; border-radius: 0px 0px 15px 15px; padding: 20px; margin-top: -15px; margin-bottom: 15px;
                             box-shadow: 0 8px 20px rgba(0,0,0,0.12);">
                     <div style="display: flex; justify-content: space-around; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 15px;">
