@@ -2162,36 +2162,37 @@ def render_usability_score():
 def render_uiux_dashboard():
     """Render dashboard UI/UX metrics"""
     st.markdown('<h2 style="color: white;">📊 UI/UX Performance Dashboard</h2>', unsafe_allow_html=True)
-    
-    # Tombol untuk memicu ETL (Agregasi Data) secara manual
-    # Penting: Dashboard membaca tabel Mart, sedangkan API menulis ke tabel Fact.
-    # Tombol ini menjembatani keduanya.
+
+    # --- PERUBAHAN: JALANKAN ETL SECARA OTOMATIS ---
+    # Menjalankan proses ETL setiap kali halaman UI/UX dibuka untuk memastikan data selalu terbaru.
+    if etl_uiux_metrics:
+        with st.spinner("Memuat dan mengagregasi data interaksi pengguna terbaru..."):
+            try:
+                etl_uiux_metrics.main_etl_uiux()
+                # Tidak perlu st.rerun() karena script akan lanjut dan membaca data yang baru di-update.
+            except Exception as e:
+                st.error(f"Gagal menjalankan ETL untuk update data UI/UX: {e}")
+    else:
+        st.error("Modul ETL (etl_uiux_metrics) tidak ditemukan. Data tidak dapat diperbarui.")
+
+    # Tombol untuk refresh manual, jika diperlukan.
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
-        if st.button("🔄 Update Data (Run ETL)"):
-            if etl_uiux_metrics:
-                with st.spinner("Sedang mengagregasi data interaksi user..."):
-                    try:
-                        etl_uiux_metrics.main_etl_uiux()
-                        st.success("Data berhasil diperbarui! Halaman akan dimuat ulang.")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Gagal update data: {e}")
-            else:
-                st.error("Modul ETL tidak ditemukan. Pastikan struktur folder benar.")
-    
+        if st.button("🔄 Refresh Halaman"):
+            st.rerun()  # Cukup rerun halaman, karena ETL sudah jalan di atas.
+
     with col_info:
-        st.info("Klik tombol ini setelah melakukan simulasi user untuk melihat hasil analisis terbaru.")
-    
+        st.info("Data diperbarui secara otomatis setiap kali Anda membuka halaman ini. Klik 'Refresh' untuk memuat ulang secara manual.")
+
     # Tab selector
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "📈 User Behavior", 
-        "🔍 Click Path", 
-        "⚠️ Error Analysis", 
-        "🎯 Funnel", 
+        "📈 User Behavior",
+        "🔍 Click Path",
+        "⚠️ Error Analysis",
+        "🎯 Funnel",
         "⭐ Usability Score"
     ])
-    
+
     with tab1:
         render_user_behavior_metrics()
     with tab2:
