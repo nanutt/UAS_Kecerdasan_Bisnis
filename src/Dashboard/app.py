@@ -2182,6 +2182,7 @@ def render_uiux_dashboard():
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
         if st.button("🔄 Refresh Halaman"):
+            st.cache_data.clear()
             st.rerun()  # Cukup rerun halaman, karena ETL sudah jalan di atas.
 
     with col_info:
@@ -2195,6 +2196,15 @@ def render_uiux_dashboard():
         "🎯 Funnel",
         "⭐ Usability Score"
     ])
+
+    with st.expander("🔧 Info Debugging Database (Cek Update Data)"):
+        st.write(f"**Lokasi Database:** `{MART_DB_FILE}`")
+        if MART_DB_FILE.exists():
+            stat = MART_DB_FILE.stat()
+            st.write(f"**Ukuran File:** {stat.st_size / 1024:.2f} KB")
+            st.write(f"**Terakhir Update (Waktu Server):** {datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')}")
+        else:
+            st.error("⚠️ File database tidak ditemukan di path tersebut.")
 
     with tab1:
         render_user_behavior_metrics()
