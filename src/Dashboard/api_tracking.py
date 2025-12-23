@@ -33,6 +33,9 @@ def track_event():
         if not all(key in data for key in required_keys):
             return jsonify({'status': 'error', 'message': 'Missing required fields'}), 400
         
+        # Log ke terminal agar terlihat ada data masuk
+        print(f"📥 Tracking Event: {data.get('action_name')} -> {data.get('element_name')}")
+
         with sqlite3.connect(MART_DB_FILE) as conn:
             # Aktifkan mode WAL untuk konkurensi yang lebih baik
             conn.execute("PRAGMA journal_mode=WAL;")
@@ -75,7 +78,7 @@ def track_event():
                 INSERT INTO fact_user_interaction 
                 (id_user, id_action, id_element, timestamp, is_success, error_message, page_url, previous_element)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (id_user, id_action, id_element, data['timestamp'], 
+            """, (id_user, id_action, id_element, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
                   data['is_success'], data.get('error_message'), data['page_url'], data.get('previous_element')))
             
             cursor.execute("COMMIT")
@@ -135,4 +138,4 @@ def health_check():
 if __name__ == '__main__':
     print("🚀 Starting Flask API for User Tracking...")
     print(f"📁 Database: {MART_DB_FILE}")
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=False)

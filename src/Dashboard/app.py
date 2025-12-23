@@ -7,10 +7,13 @@ from dash import Dash, dcc, html, dash_table
 import plotly.express as px
 import traceback
 import streamlit.components.v1 as components
+from tracking_script import inject_tracking_script
 import plotly.graph_objects as go
 import folium
 from streamlit_folium import st_folium
 import datetime
+import random
+import time
 
 # --- KONFIGURASI TEMA DAN LAYOUT ---
 st.set_page_config(
@@ -45,7 +48,7 @@ st.markdown(
     
     .card-dashboard {
         height: 120px;
-        width: 71.5%;
+        width: 97%;
         border-radius: 20px;
         margin-top: 20px;
         background-image: linear-gradient(to right, #00776b, #0B634F, #044335 60%); /* Hijau Gelap */
@@ -201,7 +204,7 @@ def main_app():
         
     # --- Sidebar (Pindah ke sini untuk kontrol terpusat) ---
     with st.sidebar:
-        st.markdown('<div style="margin-top: -10px;"></div>', unsafe_allow_html=True) # Spacer
+        st.markdown('<h2 class="sidebar-title" style="padding-left:20px; margin-top: -20px; ">Pilih Dashboard</h2>', unsafe_allow_html=True)
         page = st.radio(
             "Pilih Dashboard",
             ("Dashboard Kesehatan", "UI/UX Analytics"),
@@ -340,7 +343,7 @@ def main_app():
                     fig.data[1].hovertemplate = 'Tahun: %{x}<br>Total Kasus: %{customdata:,}<extra></extra>'                   
                     fig_html = fig.to_html(full_html=False, include_plotlyjs='cdn')                    
                     card_html = f"""
-                    <div style="background-color: #ffffff; border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; box-sizing: border-box; margin-top: 25px;" class="trend-chart-container">
+                    <div style="background-color: #ffffff; border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width:100%; box-sizing: border-box;" class="trend-chart-container">
                         <h2 style="color:#044335; font-size:1.7rem; margin-left: 20px; margin-top: 10px; font-family: 'Poppins', sans-serif !important; ">Grafik Tren</h2>
                         <style>
                             /* Pastikan elemen Plotly transparan supaya wrapper putih terlihat */
@@ -354,7 +357,7 @@ def main_app():
         except Exception as e:
             st.error(f"Gagal membuat grafik tren: {e}")
 
-        st.markdown('<h3 style="background-color: #DAA520; color: white; text-align: center; border-radius: 10px; padding: 10px; margin-top: 10px;">Analisis Berdasarkan Wilayah</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 style="background-color: #DAA520; color: white; text-align: center; border-radius: 10px; padding: 10px;">Analisis Berdasarkan Wilayah</h3>', unsafe_allow_html=True)
 
         # === Summary Cards dan Donut Chart ===
         # Tahun yang dipilih diambil dari widget radio di sidebar (st.session_state.selected_year)
@@ -398,7 +401,7 @@ def main_app():
                                     display: flex; align-items: center; gap: 20px;">
                             <div style="font-size: 3.5rem;">📋</div>
                             <div>
-                                <div style="color: #ffb74d; font-size: 2.5rem; font-weight: bold; font-family: 'Poppins', sans-serif;">
+                                <div style="color: white; font-size: 2.5rem; font-weight: bold; font-family: 'Poppins', sans-serif;">
                                     {total_cases:,}
                                 </div>
                                 <div style="color: white; font-size: 1rem; font-family: 'Poppins', sans-serif;">
@@ -414,7 +417,7 @@ def main_app():
                                     display: flex; align-items: center; gap: 20px;">
                             <div style="font-size: 3.5rem;">👥</div>
                             <div>
-                                <div style="color: #ffb74d; font-size: 2.5rem; font-weight: bold; font-family: 'Poppins', sans-serif;">
+                                <div style="color: white; font-size: 2.5rem; font-weight: bold; font-family: 'Poppins', sans-serif;">
                                     {total_workforce:,}
                                 </div>
                                 <div style="color: white; font-size: 1rem; font-family: 'Poppins', sans-serif;">
@@ -812,7 +815,7 @@ def main_app():
                     plot_bgcolor='rgba(245,245,245,0.5)',
                     paper_bgcolor='rgba(0,0,0,0)',
                     font=dict(family='Poppins, sans-serif'),
-                    margin=dict(l=60, r=40, t=80, b=60),
+                    margin=dict(l=60, r=40, t=80, b=80),
                     annotations=[
                         dict(
                             x=0.98,
@@ -874,7 +877,7 @@ def main_app():
             col1, col2 = st.columns([2, 1.3])
             with col1:
                 st.markdown("""
-                        <div style="background-color: #044335; border-radius: 15px 15px 0 0; padding: 20px 25px 15px 25px; margin-right: -173px; margin-bottom: -20px;">
+                        <div style="background-color: #044335; border-radius: 15px 15px 0 0; padding: 20px 25px 15px 25px; margin-right: -199px; margin-bottom: -20px;">
                             <h4 style="color: white; font-family: Poppins; margin: 0; padding: 0;">Kabupaten/Kota</h4>
                         </div>
                     """, unsafe_allow_html=True
@@ -1396,13 +1399,13 @@ def main_app():
                     </div>
                 </div>
                 """
-                components.html(workload_card_html, height=180)
+                components.html(workload_card_html, height=140)
             else:
                 st.markdown("""
                     <div style="background: linear-gradient(135deg, #00776b 0%, #044335 100%); 
-                                border-radius: 15px; padding: 25px; margin-top: 20px;
+                                border-radius: 15px; padding: 25px; 
                                 box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center;
-                                color: white; font-family: 'Poppins', sans-serif; height: 180px; display: flex;
+                                color: white; font-family: 'Poppins', sans-serif; height: 100px; display: flex;
                                 align-items: center; justify-content: center;">
                         Data beban kerja tidak tersedia untuk periode atau wilayah ini.
                     </div>
@@ -2160,34 +2163,110 @@ def render_usability_score():
         import traceback
         st.code(traceback.format_exc())
 
+def generate_dummy_data():
+    """Generate dummy data for demonstration purposes (Laporan Bab 4)"""
+    try:
+        with sqlite3.connect(MART_DB_FILE) as conn:
+            cursor = conn.cursor()
+            
+            # 1. User Behavior
+            cursor.execute("DELETE FROM mart_user_behavior")
+            dates = [datetime.date.today() - datetime.timedelta(days=i) for i in range(30)]
+            for date in dates:
+                sessions = random.randint(50, 200)
+                cursor.execute("""
+                    INSERT INTO mart_user_behavior (date, total_sessions, total_clicks, bounce_rate, avg_session_duration_sec, avg_clicks_per_session)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (date, sessions, sessions * random.randint(3, 10), random.uniform(20, 60), random.uniform(60, 300), random.uniform(2, 8)))
+
+            # 2. Click Path
+            cursor.execute("DELETE FROM mart_click_path")
+            paths = [
+                ("dashboard_main → filter_year → chart_trend", 150),
+                ("dashboard_main → map_click → detail_view", 120),
+                ("dashboard_main → tab_uiux → filter_date", 80),
+                ("dashboard_main → scatter_plot → hover_info", 60),
+                ("dashboard_main → filter_region → map_zoom", 45)
+            ]
+            for path, freq in paths:
+                cursor.execute("""
+                    INSERT INTO mart_click_path (path_sequence, frequency, avg_completion_time_sec, success_rate)
+                    VALUES (?, ?, ?, ?)
+                """, (path, freq, random.uniform(5, 15), random.uniform(80, 100)))
+
+            # 3. Element Performance
+            cursor.execute("DELETE FROM mart_element_performance")
+            elements = ["button_refresh", "dropdown_year", "map_marker", "tab_analytics", "chart_bar"]
+            for el in elements:
+                interactions = random.randint(100, 500)
+                errors = int(interactions * random.uniform(0.01, 0.05))
+                cursor.execute("""
+                    INSERT INTO mart_element_performance (element_name, total_interactions, error_count, error_rate, avg_dwell_time_sec)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (el, interactions, errors, (errors/interactions)*100, random.uniform(1, 5)))
+
+            # 4. Funnel
+            cursor.execute("DELETE FROM mart_funnel")
+            steps = [("Visit Dashboard", 1), ("Interact with Filter", 2), ("View Details", 3), ("Complete Analysis", 4)]
+            users = 1000
+            for step, order in steps:
+                cursor.execute("""
+                    INSERT INTO mart_funnel (step_name, step_order, user_count, dropout_rate, date)
+                    VALUES (?, ?, ?, ?, DATE('now'))
+                """, (step, order, users, random.uniform(10, 30)))
+                users = int(users * 0.7)
+
+            # 5. Usability Score
+            cursor.execute("DELETE FROM mart_usability_score")
+            cursor.execute("""
+                INSERT INTO mart_usability_score (date, task_completion_rate, avg_time_on_task_sec, error_rate, usability_score)
+                VALUES (DATE('now'), ?, ?, ?, ?)
+            """, (random.uniform(80, 95), random.uniform(30, 60), random.uniform(1, 5), random.uniform(70, 90)))
+            
+            conn.commit()
+            return True
+    except Exception as e:
+        st.error(f"Gagal membuat data dummy: {e}")
+        return False
+
 def render_uiux_dashboard():
     """Render dashboard UI/UX metrics"""
     st.markdown('<h2 style="color: white;">📊 UI/UX Performance Dashboard</h2>', unsafe_allow_html=True)
+    
+    # Toggle Mode Demo untuk Laporan
+    demo_mode = st.toggle("🔴 Mode Demonstrasi (Data Dummy untuk Laporan)", value=False)
 
-    # --- PERUBAHAN: JALANKAN ETL SECARA OTOMATIS ---
-    # Menjalankan proses ETL setiap kali halaman UI/UX dibuka untuk memastikan data selalu terbaru.
-    if etl_uiux_metrics:
-        with st.spinner("Mengupdate Data Mart: User Behavior, Click Path, Element Performance, Funnel, Usability Score..."):
-            try:
-                etl_uiux_metrics.main_etl_uiux()
-                current_time = datetime.datetime.now().strftime("%H:%M:%S")
-                st.toast(f"Semua metrik UI/UX berhasil diperbarui pada {current_time}", icon="✅")
-                # Tidak perlu st.rerun() karena script akan lanjut dan membaca data yang baru di-update.
-            except Exception as e:
-                st.error(f"Gagal menjalankan ETL untuk update data UI/UX: {e}")
+    if demo_mode:
+        st.warning("⚠️ Mode Demonstrasi Aktif: Tracking asli dinonaktifkan. Gunakan tombol di bawah untuk mengisi dashboard dengan data simulasi.")
+        if st.button("🎲 Generate Data Simulasi (Isi Dashboard)"):
+            with st.spinner("Sedang membuat data simulasi..."):
+                if generate_dummy_data():
+                    st.success("Data simulasi berhasil dibuat! Dashboard telah diperbarui.")
+                    time.sleep(1)
+                    st.rerun()
     else:
-        st.error("Modul ETL (etl_uiux_metrics) tidak ditemukan. Data tidak dapat diperbarui.")
+        # --- MODE DATA ASLI (REAL-TIME) ---
+        if etl_uiux_metrics:
+            # Jalankan ETL otomatis saat halaman dibuka untuk memproses data baru dari API
+            with st.spinner("Mengupdate Data Mart dari Tracking Asli..."):
+                try:
+                    etl_uiux_metrics.main_etl_uiux()
+                    current_time = datetime.datetime.now().strftime("%H:%M:%S")
+                    st.toast(f"Data tracking asli diperbarui: {current_time}", icon="✅")
+                except Exception as e:
+                    st.error(f"Gagal update data: {e}")
+        else:
+            st.error("Modul ETL (etl_uiux_metrics) tidak ditemukan. Pastikan file etl_scripts ada.")
+        
+        col_btn, col_info = st.columns([1, 3])
+        with col_btn:
+            if st.button("🔄 Refresh Halaman"):
+                st.cache_data.clear()
+                st.rerun()
+        with col_info:
+            st.info("Mode Tracking Asli aktif. Pastikan **Server API (Port 5001)** sedang berjalan di terminal terpisah agar data interaksi terekam.")
 
     # Tombol untuk refresh manual, jika diperlukan.
-    col_btn, col_info = st.columns([1, 3])
-    with col_btn:
-        if st.button("🔄 Refresh Halaman"):
-            st.cache_data.clear()
-            st.rerun()  # Cukup rerun halaman, karena ETL sudah jalan di atas.
-
-    with col_info:
-        st.info("Data diperbarui secara otomatis setiap kali Anda membuka halaman ini. Klik 'Refresh' untuk memuat ulang secara manual.")
-
     # Tab selector
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "📈 User Behavior",
@@ -2202,10 +2281,31 @@ def render_uiux_dashboard():
         if MART_DB_FILE.exists():
             stat = MART_DB_FILE.stat()
             st.write(f"**Ukuran File:** {stat.st_size / 1024:.2f} KB")
-            st.write(f"**Terakhir Update (Waktu Server):** {datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')}")
+            
+            # PERBAIKAN: Ganti file modification time dengan timestamp data terbaru
+            try:
+                with sqlite3.connect(MART_DB_FILE) as conn:
+                    cursor = conn.cursor()
+                    
+                    # Query timestamp terbaru dari data tracking
+                    cursor.execute("SELECT MAX(timestamp) FROM fact_user_interaction")
+                    latest_timestamp = cursor.fetchone()[0]
+                    
+                    if latest_timestamp:
+                        st.write(f"**Terakhir Update (Data Terbaru):** {latest_timestamp}")
+                    else:
+                        st.write(f"**Terakhir Update (Data Terbaru):** Belum ada data tracking")
+                    
+                    # Cek jumlah data di tabel Fact (Data Mentah)``
+                    count_interactions = cursor.execute("SELECT COUNT(*) FROM fact_user_interaction").fetchone()[0]
+                    count_sessions = cursor.execute("SELECT COUNT(*) FROM fact_session").fetchone()[0]
+                    st.write(f"**Total Interaksi (Fact):** {count_interactions:,} baris")
+                    st.write(f"**Total Sesi (Fact):** {count_sessions:,} baris")
+            except Exception as e:
+                st.error(f"Gagal membaca database: {e}")
         else:
             st.error("⚠️ File database tidak ditemukan di path tersebut.")
-
+            
     with tab1:
         render_user_behavior_metrics()
     with tab2:
@@ -2216,7 +2316,8 @@ def render_uiux_dashboard():
         render_funnel_analysis()
     with tab5:
         render_usability_score()
-
+# Inject tracking (taruh di akhir, setelah semua UI render)
+components.html(inject_tracking_script(), height=0)
 # --- JALANKAN APLIKASI ---
 if __name__ == "__main__":
     # Cukup panggil fungsi main_app yang sekarang sudah mengontrol navigasi  

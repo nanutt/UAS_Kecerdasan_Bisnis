@@ -15,7 +15,8 @@ def inject_tracking_script():
     let lastElement = null;
     
     // KONFIGURASI API: Gunakan hostname saat ini agar bisa diakses dari device lain
-    const API_BASE_URL = "http://" + window.location.hostname + ":5000";
+    const API_BASE_URL = "http://localhost:5001";
+    console.log("🔗 Tracking API URL:", API_BASE_URL);
 
     // Track page load
     window.addEventListener('load', function() {
